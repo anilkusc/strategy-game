@@ -32,7 +32,6 @@ type Pawn struct {
 	Affect    int16
 	Range     int8
 	Type      string
-	//DB        *gorm.DB `gorm:"-"`
 }
 
 func (p *Pawn) AttackTo(db *gorm.DB, pawnID uint) error {
