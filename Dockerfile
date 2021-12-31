@@ -7,7 +7,7 @@ COPY . .
 RUN go test ./...
 RUN go build -a -ldflags "-linkmode external -extldflags '-static' -s -w" -o /bin/app .
 
-FROM scratch
+FROM alpine
 WORKDIR /app
 COPY --from=build /bin/app .
-CMD ["app"]
+CMD ["./app"]
