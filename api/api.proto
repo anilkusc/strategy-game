@@ -1,0 +1,16 @@
+syntax = "proto3";
+package api;
+option go_package = "api/protos";
+
+message Values {
+  string message=1;
+}
+
+message Result {
+  string result = 1;
+}
+
+service Ping {
+  rpc Hello (Values) returns (Result) {}
+}
+//protoc --go_out=. --go-grpc_out=. -I=./api/ ./api/api.proto
