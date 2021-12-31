@@ -6,7 +6,7 @@ import (
 	"gorm.io/gorm"
 )
 
-type IBoard interface {
+type Boarder interface {
 	Create(*gorm.DB) error
 	Read(*gorm.DB) error
 	Update(*gorm.DB) error
