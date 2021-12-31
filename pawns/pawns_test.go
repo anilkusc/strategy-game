@@ -1,0 +1,65 @@
+package pawns
+
+import (
+	"testing"
+	"time"
+
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
+)
+
+func Construct() (*gorm.DB, Pawn) {
+	var pawn = Pawn{
+		Model: gorm.Model{
+			//ID:        1,
+			UpdatedAt: time.Time{},
+			CreatedAt: time.Time{},
+			DeletedAt: gorm.DeletedAt{Time: time.Time{}, Valid: false},
+		},
+		UserID:    1,
+		GameID:    1,
+		LocationX: 2,
+		LocationY: 3,
+		Health:    100,
+		Defense:   50,
+		Attack:    60,
+		Speed:     10,
+		Affect:    1,
+		Range:     1,
+		Type:      "cavalry",
+	}
+	db, _ := gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
+	db.AutoMigrate(&Pawn{})
+	return db, pawn
+}
+func Destruct() {
+	db, _ := gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
+	db.Exec("DROP TABLE pawns")
+}
+func TestAttackTo(t *testing.T) {
+	db, pawn := Construct()
+	pawn.Create(db)
+
+	tests := []struct {
+		input Pawn
+		//output error
+		err error
+	}{
+		{input: pawn, err: nil},
+	}
+
+	for _, test := range tests {
+		defenderPawn := test.input
+		err := test.input.AttackTo(db, defenderPawn.ID)
+		if test.err != err {
+			t.Errorf("Error is: %v . Expected: %v", err, test.err)
+		}
+	}
+	Destruct()
+}
+func TestMoveTo(t *testing.T) {
+
+}
+func TestIsRouteValid(t *testing.T) {
+
+}
