@@ -20,7 +20,7 @@ type Game struct {
 	User1ID uint
 	User2ID uint
 	BoardID uint
-	Status  int8 // -1: Not started,0: Draw , 1: User1 is winner , 2: User2 is winner
+	Status  int8 // -2: 1 User Ready,-1: Started,0: Draw , 1: User1 is winner , 2: User2 is winner
 }
 
 func (g *Game) Start(db *gorm.DB) error {
