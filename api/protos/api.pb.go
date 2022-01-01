@@ -20,16 +20,16 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type Values struct {
+type CreateGameInputs struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Message string `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"`
+	User1Id uint32 `protobuf:"varint,1,opt,name=user1id,proto3" json:"user1id,omitempty"`
 }
 
-func (x *Values) Reset() {
-	*x = Values{}
+func (x *CreateGameInputs) Reset() {
+	*x = CreateGameInputs{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_api_proto_msgTypes[0]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -37,13 +37,13 @@ func (x *Values) Reset() {
 	}
 }
 
-func (x *Values) String() string {
+func (x *CreateGameInputs) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*Values) ProtoMessage() {}
+func (*CreateGameInputs) ProtoMessage() {}
 
-func (x *Values) ProtoReflect() protoreflect.Message {
+func (x *CreateGameInputs) ProtoReflect() protoreflect.Message {
 	mi := &file_api_proto_msgTypes[0]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -55,28 +55,28 @@ func (x *Values) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Values.ProtoReflect.Descriptor instead.
-func (*Values) Descriptor() ([]byte, []int) {
+// Deprecated: Use CreateGameInputs.ProtoReflect.Descriptor instead.
+func (*CreateGameInputs) Descriptor() ([]byte, []int) {
 	return file_api_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *Values) GetMessage() string {
+func (x *CreateGameInputs) GetUser1Id() uint32 {
 	if x != nil {
-		return x.Message
+		return x.User1Id
 	}
-	return ""
+	return 0
 }
 
-type Result struct {
+type CreateGameOutputs struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Result string `protobuf:"bytes,1,opt,name=result,proto3" json:"result,omitempty"`
+	Gameid uint64 `protobuf:"varint,1,opt,name=gameid,proto3" json:"gameid,omitempty"`
 }
 
-func (x *Result) Reset() {
-	*x = Result{}
+func (x *CreateGameOutputs) Reset() {
+	*x = CreateGameOutputs{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_api_proto_msgTypes[1]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -84,13 +84,13 @@ func (x *Result) Reset() {
 	}
 }
 
-func (x *Result) String() string {
+func (x *CreateGameOutputs) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*Result) ProtoMessage() {}
+func (*CreateGameOutputs) ProtoMessage() {}
 
-func (x *Result) ProtoReflect() protoreflect.Message {
+func (x *CreateGameOutputs) ProtoReflect() protoreflect.Message {
 	mi := &file_api_proto_msgTypes[1]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -102,31 +102,34 @@ func (x *Result) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Result.ProtoReflect.Descriptor instead.
-func (*Result) Descriptor() ([]byte, []int) {
+// Deprecated: Use CreateGameOutputs.ProtoReflect.Descriptor instead.
+func (*CreateGameOutputs) Descriptor() ([]byte, []int) {
 	return file_api_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *Result) GetResult() string {
+func (x *CreateGameOutputs) GetGameid() uint64 {
 	if x != nil {
-		return x.Result
+		return x.Gameid
 	}
-	return ""
+	return 0
 }
 
 var File_api_proto protoreflect.FileDescriptor
 
 var file_api_proto_rawDesc = []byte{
 	0x0a, 0x09, 0x61, 0x70, 0x69, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x03, 0x61, 0x70, 0x69,
-	0x22, 0x22, 0x0a, 0x06, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x73, 0x12, 0x18, 0x0a, 0x07, 0x6d, 0x65,
-	0x73, 0x73, 0x61, 0x67, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x6d, 0x65, 0x73,
-	0x73, 0x61, 0x67, 0x65, 0x22, 0x20, 0x0a, 0x06, 0x52, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x12, 0x16,
-	0x0a, 0x06, 0x72, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06,
-	0x72, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x32, 0x2b, 0x0a, 0x04, 0x50, 0x69, 0x6e, 0x67, 0x12, 0x23,
-	0x0a, 0x05, 0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x12, 0x0b, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x56, 0x61,
-	0x6c, 0x75, 0x65, 0x73, 0x1a, 0x0b, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x52, 0x65, 0x73, 0x75, 0x6c,
-	0x74, 0x22, 0x00, 0x42, 0x0c, 0x5a, 0x0a, 0x61, 0x70, 0x69, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f,
-	0x73, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x22, 0x2c, 0x0a, 0x10, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x47, 0x61, 0x6d, 0x65, 0x49, 0x6e,
+	0x70, 0x75, 0x74, 0x73, 0x12, 0x18, 0x0a, 0x07, 0x75, 0x73, 0x65, 0x72, 0x31, 0x69, 0x64, 0x18,
+	0x01, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x07, 0x75, 0x73, 0x65, 0x72, 0x31, 0x69, 0x64, 0x22, 0x2b,
+	0x0a, 0x11, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x47, 0x61, 0x6d, 0x65, 0x4f, 0x75, 0x74, 0x70,
+	0x75, 0x74, 0x73, 0x12, 0x16, 0x0a, 0x06, 0x67, 0x61, 0x6d, 0x65, 0x69, 0x64, 0x18, 0x01, 0x20,
+	0x01, 0x28, 0x04, 0x52, 0x06, 0x67, 0x61, 0x6d, 0x65, 0x69, 0x64, 0x32, 0x4d, 0x0a, 0x0c, 0x53,
+	0x74, 0x72, 0x61, 0x74, 0x65, 0x67, 0x79, 0x47, 0x61, 0x6d, 0x65, 0x12, 0x3d, 0x0a, 0x0a, 0x43,
+	0x72, 0x65, 0x61, 0x74, 0x65, 0x47, 0x61, 0x6d, 0x65, 0x12, 0x15, 0x2e, 0x61, 0x70, 0x69, 0x2e,
+	0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x47, 0x61, 0x6d, 0x65, 0x49, 0x6e, 0x70, 0x75, 0x74, 0x73,
+	0x1a, 0x16, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x47, 0x61, 0x6d,
+	0x65, 0x4f, 0x75, 0x74, 0x70, 0x75, 0x74, 0x73, 0x22, 0x00, 0x42, 0x0c, 0x5a, 0x0a, 0x61, 0x70,
+	0x69, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -143,12 +146,12 @@ func file_api_proto_rawDescGZIP() []byte {
 
 var file_api_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_api_proto_goTypes = []interface{}{
-	(*Values)(nil), // 0: api.Values
-	(*Result)(nil), // 1: api.Result
+	(*CreateGameInputs)(nil),  // 0: api.CreateGameInputs
+	(*CreateGameOutputs)(nil), // 1: api.CreateGameOutputs
 }
 var file_api_proto_depIdxs = []int32{
-	0, // 0: api.Ping.Hello:input_type -> api.Values
-	1, // 1: api.Ping.Hello:output_type -> api.Result
+	0, // 0: api.StrategyGame.CreateGame:input_type -> api.CreateGameInputs
+	1, // 1: api.StrategyGame.CreateGame:output_type -> api.CreateGameOutputs
 	1, // [1:2] is the sub-list for method output_type
 	0, // [0:1] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
@@ -163,7 +166,7 @@ func file_api_proto_init() {
 	}
 	if !protoimpl.UnsafeEnabled {
 		file_api_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Values); i {
+			switch v := v.(*CreateGameInputs); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -175,7 +178,7 @@ func file_api_proto_init() {
 			}
 		}
 		file_api_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Result); i {
+			switch v := v.(*CreateGameOutputs); i {
 			case 0:
 				return &v.state
 			case 1:

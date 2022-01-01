@@ -17,7 +17,7 @@ import (
 
 type App struct {
 	DB *gorm.DB
-	protos.UnimplementedPingServer
+	protos.UnimplementedStrategyGameServer
 }
 
 func (a *App) Init() {
@@ -30,11 +30,7 @@ func (a *App) Init() {
 	}
 	log.Info("connected to database..")
 	log.Info("migrating database tables...")
-	a.DB.AutoMigrate(&games.Game{})
-	a.DB.AutoMigrate(&users.User{})
-	a.DB.AutoMigrate(&pawns.Pawn{})
-	a.DB.AutoMigrate(&boards.Board{})
-	a.DB.AutoMigrate(&moves.Move{})
+	a.DB.AutoMigrate(&games.Game{}, &users.User{}, &pawns.Pawn{}, &boards.Board{}, &moves.Move{})
 	log.Info("migrated...")
 	log.Info("creating grpc api...")
 	lis, err := net.Listen("tcp", ":5000")
@@ -43,7 +39,7 @@ func (a *App) Init() {
 	}
 
 	s := grpc.NewServer()
-	protos.RegisterPingServer(s, &App{})
+	protos.RegisterStrategyGameServer(s, a)
 	log.Info("server listening at ", lis.Addr())
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)

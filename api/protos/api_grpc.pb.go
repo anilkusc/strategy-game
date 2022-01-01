@@ -14,86 +14,86 @@ import (
 // Requires gRPC-Go v1.32.0 or later.
 const _ = grpc.SupportPackageIsVersion7
 
-// PingClient is the client API for Ping service.
+// StrategyGameClient is the client API for StrategyGame service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type PingClient interface {
-	Hello(ctx context.Context, in *Values, opts ...grpc.CallOption) (*Result, error)
+type StrategyGameClient interface {
+	CreateGame(ctx context.Context, in *CreateGameInputs, opts ...grpc.CallOption) (*CreateGameOutputs, error)
 }
 
-type pingClient struct {
+type strategyGameClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewPingClient(cc grpc.ClientConnInterface) PingClient {
-	return &pingClient{cc}
+func NewStrategyGameClient(cc grpc.ClientConnInterface) StrategyGameClient {
+	return &strategyGameClient{cc}
 }
 
-func (c *pingClient) Hello(ctx context.Context, in *Values, opts ...grpc.CallOption) (*Result, error) {
-	out := new(Result)
-	err := c.cc.Invoke(ctx, "/api.Ping/Hello", in, out, opts...)
+func (c *strategyGameClient) CreateGame(ctx context.Context, in *CreateGameInputs, opts ...grpc.CallOption) (*CreateGameOutputs, error) {
+	out := new(CreateGameOutputs)
+	err := c.cc.Invoke(ctx, "/api.StrategyGame/CreateGame", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// PingServer is the server API for Ping service.
-// All implementations must embed UnimplementedPingServer
+// StrategyGameServer is the server API for StrategyGame service.
+// All implementations must embed UnimplementedStrategyGameServer
 // for forward compatibility
-type PingServer interface {
-	Hello(context.Context, *Values) (*Result, error)
-	mustEmbedUnimplementedPingServer()
+type StrategyGameServer interface {
+	CreateGame(context.Context, *CreateGameInputs) (*CreateGameOutputs, error)
+	mustEmbedUnimplementedStrategyGameServer()
 }
 
-// UnimplementedPingServer must be embedded to have forward compatible implementations.
-type UnimplementedPingServer struct {
+// UnimplementedStrategyGameServer must be embedded to have forward compatible implementations.
+type UnimplementedStrategyGameServer struct {
 }
 
-func (UnimplementedPingServer) Hello(context.Context, *Values) (*Result, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Hello not implemented")
+func (UnimplementedStrategyGameServer) CreateGame(context.Context, *CreateGameInputs) (*CreateGameOutputs, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateGame not implemented")
 }
-func (UnimplementedPingServer) mustEmbedUnimplementedPingServer() {}
+func (UnimplementedStrategyGameServer) mustEmbedUnimplementedStrategyGameServer() {}
 
-// UnsafePingServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to PingServer will
+// UnsafeStrategyGameServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to StrategyGameServer will
 // result in compilation errors.
-type UnsafePingServer interface {
-	mustEmbedUnimplementedPingServer()
+type UnsafeStrategyGameServer interface {
+	mustEmbedUnimplementedStrategyGameServer()
 }
 
-func RegisterPingServer(s grpc.ServiceRegistrar, srv PingServer) {
-	s.RegisterService(&Ping_ServiceDesc, srv)
+func RegisterStrategyGameServer(s grpc.ServiceRegistrar, srv StrategyGameServer) {
+	s.RegisterService(&StrategyGame_ServiceDesc, srv)
 }
 
-func _Ping_Hello_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Values)
+func _StrategyGame_CreateGame_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateGameInputs)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(PingServer).Hello(ctx, in)
+		return srv.(StrategyGameServer).CreateGame(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/api.Ping/Hello",
+		FullMethod: "/api.StrategyGame/CreateGame",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PingServer).Hello(ctx, req.(*Values))
+		return srv.(StrategyGameServer).CreateGame(ctx, req.(*CreateGameInputs))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-// Ping_ServiceDesc is the grpc.ServiceDesc for Ping service.
+// StrategyGame_ServiceDesc is the grpc.ServiceDesc for StrategyGame service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var Ping_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "api.Ping",
-	HandlerType: (*PingServer)(nil),
+var StrategyGame_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "api.StrategyGame",
+	HandlerType: (*StrategyGameServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "Hello",
-			Handler:    _Ping_Hello_Handler,
+			MethodName: "CreateGame",
+			Handler:    _StrategyGame_CreateGame_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
