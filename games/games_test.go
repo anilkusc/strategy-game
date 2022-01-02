@@ -1,6 +1,7 @@
 package games
 
 import (
+	"strategy-game/boards"
 	"testing"
 	"time"
 
@@ -22,15 +23,16 @@ func Construct() (*gorm.DB, Game) {
 		BoardID: 1,
 	}
 	db, _ = gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
-	db.AutoMigrate(&Game{})
+	db.AutoMigrate(&Game{}, &boards.Board{})
 	return db, game
 }
 func Destruct() {
 	db, _ := gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
 	db.Exec("DROP TABLE games")
+	db.Exec("DROP TABLE boards")
 }
 
-func TestStart(t *testing.T) {
+func TestCreateNewGame(t *testing.T) {
 	db, game := Construct()
 
 	tests := []struct {
@@ -43,7 +45,28 @@ func TestStart(t *testing.T) {
 		},
 	}
 	for _, test := range tests {
-		err := game.Start(db)
+		err := game.CreateNewGame(db)
+		if test.err != err {
+			t.Errorf("Error is: %v . Expected: %v", err, test.err)
+		}
+	}
+	Destruct()
+}
+func TestJoinGame(t *testing.T) {
+	db, game := Construct()
+	game.CreateNewGame(db)
+
+	tests := []struct {
+		input uint
+		err   error
+	}{
+		{
+			input: 2,
+			err:   nil,
+		},
+	}
+	for _, test := range tests {
+		err := game.JoinGame(db, test.input)
 		if test.err != err {
 			t.Errorf("Error is: %v . Expected: %v", err, test.err)
 		}

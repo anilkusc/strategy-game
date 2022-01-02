@@ -3,13 +3,35 @@ package api;
 option go_package = "api/protos";
 
 message CreateGameInputs {
-  uint32 user1id=1;
+  uint32 userid=1;
 }
 message CreateGameOutputs {
   uint64 gameid=1;
 }
+message JoinGameInputs {
+  uint32 gameid=1;
+  uint32 userid=2;
+}
+message JoinGameOutputs {
+  uint32 otherusersid=1;
+  string terrainmap=2;
+  string featuredmap=3;
+}
+
+message MoveInputs {
+  uint32 userid=1;
+  uint32 gameid=2;
+  uint32 pawnid=3;
+  uint32 x=4;
+  uint32 y=5;
+}
+message MoveOutputs {
+  bool OK=1;
+}
  
 service StrategyGame {
   rpc CreateGame (CreateGameInputs) returns (CreateGameOutputs) {}
+  rpc JoinGame (JoinGameInputs) returns (JoinGameOutputs) {}
+  rpc MakeMove (MoveInputs) returns (MoveOutputs) {}
 }
 //protoc --go_out=. --go-grpc_out=. -I=./api/ ./api/api.proto

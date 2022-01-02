@@ -16,7 +16,7 @@ type Boarder interface {
 	ArrayToJson([][]int16) (string, error)
 	JsonToArray(string) ([][]int16, error)
 	DeployPawn(*gorm.DB, uint, int16, int16) error
-	CreateBoard() error
+	CreateBoard(db *gorm.DB) error
 }
 
 type Board struct {
@@ -48,7 +48,7 @@ func (b *Board) DeployPawn(db *gorm.DB, pawnID uint, X int16, Y int16) error {
 	}
 
 }
-func (b *Board) CreateBoard() error {
+func (b *Board) CreateBoard(db *gorm.DB) error {
 	switch b.Type {
 	case "flat":
 		var err error
@@ -70,7 +70,10 @@ func (b *Board) CreateBoard() error {
 		if err != nil {
 			return err
 		}
-
+		err = b.Create(db)
+		if err != nil {
+			return err
+		}
 		return nil
 	default:
 		return errors.New("board type is not recognized")

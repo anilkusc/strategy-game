@@ -53,13 +53,13 @@ func Destruct() {
 func TestCreateGame(t *testing.T) {
 	Construct()
 	tests := []struct {
-		input  uint32
-		output uint64
+		userid uint32
+		gameid uint64
 		err    error
 	}{
 		{
-			input:  1,
-			output: 1,
+			userid: 1,
+			gameid: 1,
 			err:    nil,
 		},
 	}
@@ -72,13 +72,66 @@ func TestCreateGame(t *testing.T) {
 	client := protos.NewStrategyGameClient(conn)
 
 	for _, test := range tests {
-		req := &protos.CreateGameInputs{User1Id: test.input}
+		req := &protos.CreateGameInputs{Userid: test.userid}
 		resp, err := client.CreateGame(ctx, req)
 		if test.err != err {
 			t.Errorf("Error is: %v . Expected: %v", err, test.err)
 		}
-		if resp.Gameid != test.output {
-			t.Errorf("Result is: %v . Expected: %v", resp.Gameid, test.output)
+		if resp.Gameid != test.gameid {
+			t.Errorf("Result is: %v . Expected: %v", resp.Gameid, test.gameid)
+		}
+
+	}
+	Destruct()
+}
+func TestJoinGame(t *testing.T) {
+	a := Construct()
+	game := games.Game{
+		Status:  -1,
+		BoardID: 1,
+		User1ID: 1,
+		User2ID: 0,
+	}
+	game.CreateNewGame(a.DB)
+	tests := []struct {
+		gameid       uint32
+		userid       uint32
+		otherusersid uint32
+		terrainmap   string
+		featuredmap  string
+		err          error
+	}{
+		{
+			gameid:       1,
+			userid:       2,
+			otherusersid: 1,
+			terrainmap:   "[[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]]",
+			featuredmap:  "[[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]]",
+			err:          nil,
+		},
+	}
+	ctx := context.Background()
+	conn, err := grpc.DialContext(ctx, "bufnet", grpc.WithContextDialer(bufDialer), grpc.WithInsecure())
+	if err != nil {
+		t.Fatalf("Failed to dial bufnet: %v", err)
+	}
+	defer conn.Close()
+	client := protos.NewStrategyGameClient(conn)
+
+	for _, test := range tests {
+		req := &protos.JoinGameInputs{Userid: test.userid, Gameid: test.gameid}
+		resp, err := client.JoinGame(ctx, req)
+		if test.err != err {
+			t.Errorf("Error is: %v . Expected: %v", err, test.err)
+		}
+		if resp.Otherusersid != test.otherusersid {
+			t.Errorf("Result is: %v . Expected: %v", resp.Otherusersid, test.otherusersid)
+		}
+		if resp.Terrainmap != test.terrainmap {
+			t.Errorf("Result is: %v . Expected: %v", resp.Terrainmap, test.terrainmap)
+		}
+		if resp.Featuredmap != test.featuredmap {
+			t.Errorf("Result is: %v . Expected: %v", resp.Featuredmap, test.featuredmap)
 		}
 
 	}

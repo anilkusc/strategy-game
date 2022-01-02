@@ -11,3 +11,4 @@ FROM alpine
 WORKDIR /app
 COPY --from=build /bin/app .
 CMD ["./app"]
+#protoc --go_out=. --go-grpc_out=. -I=./api/ ./api/api.proto

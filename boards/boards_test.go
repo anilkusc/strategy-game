@@ -60,6 +60,7 @@ func TestDeployPawn(t *testing.T) {
 	Destruct()
 }
 func TestCreateBoard(t *testing.T) {
+	db, _ := Construct()
 	var board = Board{
 		GameID:  1,
 		LengthX: 20,
@@ -125,7 +126,7 @@ func TestCreateBoard(t *testing.T) {
 		},
 	}
 	for _, test := range tests {
-		err := board.CreateBoard()
+		err := board.CreateBoard(db)
 		if test.err != err {
 			t.Errorf("Error is: %v . Expected: %v", err, test.err)
 		}
@@ -142,5 +143,5 @@ func TestCreateBoard(t *testing.T) {
 			t.Errorf("Result is: %v . Expected: %v", board.FeaturedMapJson, test.output4)
 		}
 	}
-
+	Destruct()
 }
