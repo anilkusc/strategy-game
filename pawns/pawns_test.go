@@ -57,6 +57,47 @@ func TestAttackTo(t *testing.T) {
 	}
 	Destruct()
 }
+func TestInitiatePawn(t *testing.T) {
+	_, pawn := Construct()
+
+	tests := []struct {
+		input  Pawn
+		output Pawn
+		err    error
+	}{
+		{
+			input: pawn,
+			output: Pawn{
+				Model: gorm.Model{
+					UpdatedAt: time.Time{},
+					CreatedAt: time.Time{},
+					DeletedAt: gorm.DeletedAt{Time: time.Time{}, Valid: false},
+				},
+				UserID:    1,
+				GameID:    1,
+				LocationX: 2,
+				LocationY: 3,
+				Health:    100,
+				Defense:   50,
+				Attack:    60,
+				Speed:     6,
+				Affect:    1,
+				Range:     1,
+				Type:      "cavalry",
+			}, err: nil},
+	}
+
+	for _, test := range tests {
+		err := test.input.InitiatePawn()
+		if test.err != err {
+			t.Errorf("Error is: %v . Expected: %v", err, test.err)
+		}
+		if test.output != test.input {
+			t.Errorf("Result is: %v . Expected: %v", test.output, test.input)
+		}
+	}
+	Destruct()
+}
 func TestMoveTo(t *testing.T) {
 
 }

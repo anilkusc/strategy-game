@@ -1,6 +1,7 @@
 package pawns
 
 import (
+	"errors"
 	"strconv"
 
 	log "github.com/sirupsen/logrus"
@@ -17,6 +18,7 @@ type Pawner interface {
 	AttackTo(*gorm.DB, uint) error
 	MoveTo(*gorm.DB, uint16, uint16) error
 	IsRouteValid(*gorm.DB, uint16, uint16) bool
+	InitiatePawn(*gorm.DB, uint16, uint16) error
 }
 
 type Pawn struct {
@@ -34,6 +36,20 @@ type Pawn struct {
 	Type      string
 }
 
+func (p *Pawn) InitiatePawn() error {
+	switch p.Type {
+	case "cavalry":
+		p.Health = 100
+		p.Defense = 50
+		p.Attack = 60
+		p.Speed = 6
+		p.Affect = 1
+		p.Range = 1
+		return nil
+	default:
+		return errors.New("unknown pawn type")
+	}
+}
 func (p *Pawn) AttackTo(db *gorm.DB, pawnID uint) error {
 	log.Info("Pawn " + strconv.Itoa(int(p.ID)) + " attacking to Pawn " + strconv.Itoa(int(pawnID)))
 	defenderPawn := Pawn{Model: gorm.Model{ID: pawnID}}

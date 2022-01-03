@@ -36,6 +36,7 @@ func (g *Game) CreateNewGame(db *gorm.DB) error {
 	if err != nil {
 		return err
 	}
+
 	g.BoardID = board.ID
 	err = g.Create(db)
 	if err != nil {
