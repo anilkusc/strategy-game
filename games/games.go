@@ -59,6 +59,10 @@ func (g *Game) CreateNewGame(db *gorm.DB, userid uint) error {
 	if err != nil {
 		return err
 	}
+	err = pawn.Create(db)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -78,6 +82,10 @@ func (g *Game) JoinGame(db *gorm.DB, user2id uint) error {
 		Type:      "cavalry",
 	}
 	err = pawn.InitiatePawn()
+	if err != nil {
+		return err
+	}
+	err = pawn.Create(db)
 	if err != nil {
 		return err
 	}

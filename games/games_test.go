@@ -2,6 +2,7 @@ package games
 
 import (
 	"strategy-game/boards"
+	"strategy-game/pawns"
 	"testing"
 	"time"
 
@@ -23,13 +24,14 @@ func Construct() (*gorm.DB, Game) {
 		BoardID: 1,
 	}
 	db, _ = gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
-	db.AutoMigrate(&Game{}, &boards.Board{})
+	db.AutoMigrate(&Game{}, &boards.Board{}, &pawns.Pawn{})
 	return db, game
 }
 func Destruct() {
 	db, _ := gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
 	db.Exec("DROP TABLE games")
 	db.Exec("DROP TABLE boards")
+	db.Exec("DROP TABLE pawns")
 }
 
 func TestCreateNewGame(t *testing.T) {

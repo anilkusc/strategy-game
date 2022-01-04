@@ -73,8 +73,22 @@ func (p *Pawn) AttackTo(db *gorm.DB, pawnID uint) error {
 }
 
 func (p *Pawn) MoveTo(db *gorm.DB, X uint16, Y uint16) error {
+	err := p.Read(db)
+	if err != nil {
+		return err
+	}
+	if p.IsRouteValid(db, X, Y) {
+		p.LocationX = X
+		p.LocationY = Y
+		err := p.Update(db)
+		if err != nil {
+			return err
+		}
+		return nil
+	} else {
+		return errors.New("this move is not permitted")
+	}
 
-	return nil
 }
 
 func (p *Pawn) IsRouteValid(db *gorm.DB, X uint16, Y uint16) bool {
