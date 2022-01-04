@@ -18,13 +18,13 @@ func (a *App) CreateGame(ctx context.Context, in *protos.CreateGameInputs) (*pro
 		BoardID: 0,
 		Status:  -2,
 	}
-	err := game.CreateNewGame(a.DB)
+
+	err := game.CreateNewGame(a.DB, game.User1ID)
 	if err != nil {
 		log.Error(err)
 		return &protos.CreateGameOutputs{Gameid: 0}, err
-	} else {
-		return &protos.CreateGameOutputs{Gameid: uint64(game.ID)}, nil
 	}
+	return &protos.CreateGameOutputs{Gameid: uint64(game.ID)}, nil
 
 }
 

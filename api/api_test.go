@@ -92,7 +92,7 @@ func TestJoinGame(t *testing.T) {
 		User1ID: 1,
 		User2ID: 0,
 	}
-	game.CreateNewGame(a.DB)
+	game.CreateNewGame(a.DB, game.User1ID)
 	tests := []struct {
 		gameid       uint32
 		userid       uint32

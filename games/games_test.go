@@ -34,7 +34,7 @@ func Destruct() {
 
 func TestCreateNewGame(t *testing.T) {
 	db, game := Construct()
-
+	game.ID = 1
 	tests := []struct {
 		input Game
 		err   error
@@ -45,7 +45,7 @@ func TestCreateNewGame(t *testing.T) {
 		},
 	}
 	for _, test := range tests {
-		err := game.CreateNewGame(db)
+		err := game.CreateNewGame(db, game.ID)
 		if test.err != err {
 			t.Errorf("Error is: %v . Expected: %v", err, test.err)
 		}
@@ -54,7 +54,8 @@ func TestCreateNewGame(t *testing.T) {
 }
 func TestJoinGame(t *testing.T) {
 	db, game := Construct()
-	game.CreateNewGame(db)
+	game.ID = 1
+	game.CreateNewGame(db, game.ID)
 
 	tests := []struct {
 		input uint
