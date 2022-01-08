@@ -126,7 +126,7 @@ func TestCreateBoard(t *testing.T) {
 		},
 	}
 	for _, test := range tests {
-		err := board.CreateBoard(db)
+		err := board.CreateBoard(db, board.GameID)
 		if test.err != err {
 			t.Errorf("Error is: %v . Expected: %v", err, test.err)
 		}

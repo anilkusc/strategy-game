@@ -17,17 +17,16 @@ func Construct() (*gorm.DB, Pawn) {
 			CreatedAt: time.Time{},
 			DeletedAt: gorm.DeletedAt{Time: time.Time{}, Valid: false},
 		},
-		UserID:    1,
-		GameID:    1,
-		LocationX: 2,
-		LocationY: 3,
-		Health:    100,
-		Defense:   50,
-		Attack:    60,
-		Speed:     10,
-		Affect:    1,
-		Range:     1,
-		Type:      "cavalry",
+		UserID:  1,
+		BoardID: 1,
+		GameID:  1,
+		Health:  100,
+		Defense: 50,
+		Attack:  60,
+		Speed:   10,
+		Affect:  1,
+		Range:   1,
+		Type:    "cavalry",
 	}
 	db, _ := gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
 	db.AutoMigrate(&Pawn{}, &boards.Board{})
@@ -75,17 +74,16 @@ func TestInitiatePawn(t *testing.T) {
 					CreatedAt: time.Time{},
 					DeletedAt: gorm.DeletedAt{Time: time.Time{}, Valid: false},
 				},
-				UserID:    1,
-				GameID:    1,
-				LocationX: 2,
-				LocationY: 3,
-				Health:    100,
-				Defense:   50,
-				Attack:    60,
-				Speed:     6,
-				Affect:    1,
-				Range:     1,
-				Type:      "cavalry",
+				UserID:  1,
+				BoardID: 1,
+				GameID:  1,
+				Health:  100,
+				Defense: 50,
+				Attack:  60,
+				Speed:   6,
+				Affect:  1,
+				Range:   1,
+				Type:    "cavalry",
 			}, err: nil},
 	}
 
@@ -99,52 +97,4 @@ func TestInitiatePawn(t *testing.T) {
 		}
 	}
 	Destruct()
-}
-func TestMoveTo(t *testing.T) {
-	db, pawn := Construct()
-	pawn.Create(db)
-	tests := []struct {
-		input  Pawn
-		output Pawn
-		err    error
-	}{
-		{
-			input: pawn,
-			output: Pawn{
-				Model: gorm.Model{
-					ID:        1,
-					UpdatedAt: time.Time{},
-					CreatedAt: time.Time{},
-					DeletedAt: gorm.DeletedAt{Time: time.Time{}, Valid: false},
-				},
-				UserID:    1,
-				GameID:    1,
-				LocationX: 5,
-				LocationY: 5,
-				Health:    100,
-				Defense:   50,
-				Attack:    60,
-				Speed:     10,
-				Affect:    1,
-				Range:     1,
-				Type:      "cavalry",
-			}, err: nil},
-	}
-
-	for _, test := range tests {
-		err := test.input.MoveTo(db, 5, 5)
-		test.input.UpdatedAt = time.Time{}
-		test.input.CreatedAt = time.Time{}
-		test.input.DeletedAt = gorm.DeletedAt{Time: time.Time{}, Valid: false}
-		if test.err != err {
-			t.Errorf("Error is: %v . Expected: %v", err, test.err)
-		}
-		if test.output != test.input {
-			t.Errorf("Result is: %v . Expected: %v", test.input, test.output)
-		}
-	}
-	Destruct()
-}
-func TestIsRouteValid(t *testing.T) {
-
 }

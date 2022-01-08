@@ -17,23 +17,23 @@ type Pawner interface {
 	List(*gorm.DB) ([]Pawn, error)
 	AttackTo(*gorm.DB, uint) error
 	MoveTo(*gorm.DB, uint16, uint16) error
-	IsRouteValid(*gorm.DB, uint16, uint16) bool
 	InitiatePawn(*gorm.DB, uint16, uint16) error
 }
 
 type Pawn struct {
 	gorm.Model
-	UserID    uint
-	GameID    uint
-	LocationX uint16
-	LocationY uint16
-	Health    int16
-	Defense   int16
-	Attack    int16
-	Speed     int16
-	Affect    int16
-	Range     int8
-	Type      string
+	UserID  uint
+	GameID  uint
+	BoardID uint
+	//	LocationX uint16
+	//	LocationY uint16
+	Health  int16
+	Defense int16
+	Attack  int16
+	Speed   int16
+	Affect  int16
+	Range   int8
+	Type    string
 }
 
 func (p *Pawn) InitiatePawn() error {
@@ -70,28 +70,4 @@ func (p *Pawn) AttackTo(db *gorm.DB, pawnID uint) error {
 		return err
 	}
 	return nil
-}
-
-func (p *Pawn) MoveTo(db *gorm.DB, X uint16, Y uint16) error {
-	err := p.Read(db)
-	if err != nil {
-		return err
-	}
-	if p.IsRouteValid(db, X, Y) {
-		p.LocationX = X
-		p.LocationY = Y
-		err := p.Update(db)
-		if err != nil {
-			return err
-		}
-		return nil
-	} else {
-		return errors.New("this move is not permitted")
-	}
-
-}
-
-func (p *Pawn) IsRouteValid(db *gorm.DB, X uint16, Y uint16) bool {
-
-	return true
 }

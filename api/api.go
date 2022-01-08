@@ -15,7 +15,6 @@ func (a *App) CreateGame(ctx context.Context, in *protos.CreateGameInputs) (*pro
 	game := games.Game{
 		User1ID: uint(in.Userid),
 		User2ID: 0,
-		BoardID: 0,
 		Status:  -2,
 	}
 
