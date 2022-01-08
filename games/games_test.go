@@ -21,6 +21,7 @@ func Construct() (*gorm.DB, Game) {
 		},
 		User1ID: 1,
 		User2ID: 2,
+		BoardID: 1,
 	}
 	db, _ = gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
 	db.AutoMigrate(&Game{}, &boards.Board{}, &pawns.Pawn{})

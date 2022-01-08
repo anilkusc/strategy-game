@@ -22,18 +22,17 @@ type Pawner interface {
 
 type Pawn struct {
 	gorm.Model
-	UserID  uint
-	GameID  uint
-	BoardID uint
-	//	LocationX uint16
-	//	LocationY uint16
-	Health  int16
-	Defense int16
-	Attack  int16
-	Speed   int16
-	Affect  int16
-	Range   int8
-	Type    string
+	UserID    uint
+	GameID    uint
+	BoardID   uint
+	Direction uint8 // 1 right , 2 up , 3 left , 4 down
+	Health    int16
+	Defense   int16
+	Attack    int16
+	Speed     int16
+	Affect    int16
+	Range     int8
+	Type      string
 }
 
 func (p *Pawn) InitiatePawn() error {

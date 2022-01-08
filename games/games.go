@@ -23,6 +23,7 @@ type Game struct {
 	gorm.Model
 	User1ID uint
 	User2ID uint
+	BoardID uint
 	Status  int8 // -2: 1 User Ready,-1: Started,0: Draw , 1: User1 is winner , 2: User2 is winner
 }
 
@@ -45,6 +46,16 @@ func (g *Game) CreateNewGame(db *gorm.DB, userid uint) error {
 	if err != nil {
 		return err
 	}
+	err = board.Read(db)
+	if err != nil {
+		return err
+	}
+	g.BoardID = board.ID
+	err = g.Update(db)
+	if err != nil {
+		return err
+	}
+
 	pawn := pawns.Pawn{
 		UserID:  uint(userid),
 		GameID:  g.ID,
@@ -59,7 +70,7 @@ func (g *Game) CreateNewGame(db *gorm.DB, userid uint) error {
 	if err != nil {
 		return err
 	}
-	err = board.DeployPawn(db, pawn.ID, 10, 2)
+	err = board.DeployPawn(db, pawn.ID, 5, 10)
 	if err != nil {
 		return err
 	}
@@ -75,15 +86,26 @@ func (g *Game) JoinGame(db *gorm.DB, user2id uint) error {
 		return err
 	}
 	pawn := pawns.Pawn{
-		UserID: g.User2ID,
-		GameID: g.ID,
-		Type:   "cavalry",
+		UserID:  g.User2ID,
+		GameID:  g.ID,
+		BoardID: g.BoardID,
+		Type:    "cavalry",
 	}
 	err = pawn.InitiatePawn()
 	if err != nil {
 		return err
 	}
 	err = pawn.Create(db)
+	if err != nil {
+		return err
+	}
+	board := boards.Board{Model: gorm.Model{ID: g.BoardID}}
+
+	err = board.Read(db)
+	if err != nil {
+		return err
+	}
+	err = board.DeployPawn(db, pawn.ID, 15, 10)
 	if err != nil {
 		return err
 	}
