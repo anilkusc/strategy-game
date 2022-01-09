@@ -6,7 +6,7 @@ message CreateGameInputs {
   uint32 userid=1;
 }
 message CreateGameOutputs {
-  uint64 gameid=1;
+  uint32 gameid=1;
 }
 message JoinGameInputs {
   uint32 gameid=1;
@@ -18,13 +18,23 @@ message JoinGameOutputs {
   string featuredmap=3;
 }
 
-message MoveInputs {
+message Move{
+  int32 x=2;
+  int32 y=3;
+  int32 direction=4;
+}
+
+message MoveInput {
+  uint32 pawnid=3;
+  repeated Move move=4;
+}
+
+message MoveInputs{
   uint32 userid=1;
   uint32 gameid=2;
-  uint32 pawnid=3;
-  uint32 x=4;
-  uint32 y=5;
+  repeated MoveInput moveinput=3;
 }
+
 message MoveOutputs {
   bool OK=1;
 }

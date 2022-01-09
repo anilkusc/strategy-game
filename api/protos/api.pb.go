@@ -72,7 +72,7 @@ type CreateGameOutputs struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Gameid uint64 `protobuf:"varint,1,opt,name=gameid,proto3" json:"gameid,omitempty"`
+	Gameid uint32 `protobuf:"varint,1,opt,name=gameid,proto3" json:"gameid,omitempty"`
 }
 
 func (x *CreateGameOutputs) Reset() {
@@ -107,7 +107,7 @@ func (*CreateGameOutputs) Descriptor() ([]byte, []int) {
 	return file_api_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *CreateGameOutputs) GetGameid() uint64 {
+func (x *CreateGameOutputs) GetGameid() uint32 {
 	if x != nil {
 		return x.Gameid
 	}
@@ -232,22 +232,138 @@ func (x *JoinGameOutputs) GetFeaturedmap() string {
 	return ""
 }
 
+type Move struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	X         int32 `protobuf:"varint,2,opt,name=x,proto3" json:"x,omitempty"`
+	Y         int32 `protobuf:"varint,3,opt,name=y,proto3" json:"y,omitempty"`
+	Direction int32 `protobuf:"varint,4,opt,name=direction,proto3" json:"direction,omitempty"`
+}
+
+func (x *Move) Reset() {
+	*x = Move{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_api_proto_msgTypes[4]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *Move) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Move) ProtoMessage() {}
+
+func (x *Move) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[4]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Move.ProtoReflect.Descriptor instead.
+func (*Move) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *Move) GetX() int32 {
+	if x != nil {
+		return x.X
+	}
+	return 0
+}
+
+func (x *Move) GetY() int32 {
+	if x != nil {
+		return x.Y
+	}
+	return 0
+}
+
+func (x *Move) GetDirection() int32 {
+	if x != nil {
+		return x.Direction
+	}
+	return 0
+}
+
+type MoveInput struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Pawnid uint32  `protobuf:"varint,3,opt,name=pawnid,proto3" json:"pawnid,omitempty"`
+	Move   []*Move `protobuf:"bytes,4,rep,name=move,proto3" json:"move,omitempty"`
+}
+
+func (x *MoveInput) Reset() {
+	*x = MoveInput{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_api_proto_msgTypes[5]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *MoveInput) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MoveInput) ProtoMessage() {}
+
+func (x *MoveInput) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[5]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use MoveInput.ProtoReflect.Descriptor instead.
+func (*MoveInput) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *MoveInput) GetPawnid() uint32 {
+	if x != nil {
+		return x.Pawnid
+	}
+	return 0
+}
+
+func (x *MoveInput) GetMove() []*Move {
+	if x != nil {
+		return x.Move
+	}
+	return nil
+}
+
 type MoveInputs struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Userid uint32 `protobuf:"varint,1,opt,name=userid,proto3" json:"userid,omitempty"`
-	Gameid uint32 `protobuf:"varint,2,opt,name=gameid,proto3" json:"gameid,omitempty"`
-	Pawnid uint32 `protobuf:"varint,3,opt,name=pawnid,proto3" json:"pawnid,omitempty"`
-	X      uint32 `protobuf:"varint,4,opt,name=x,proto3" json:"x,omitempty"`
-	Y      uint32 `protobuf:"varint,5,opt,name=y,proto3" json:"y,omitempty"`
+	Userid    uint32       `protobuf:"varint,1,opt,name=userid,proto3" json:"userid,omitempty"`
+	Gameid    uint32       `protobuf:"varint,2,opt,name=gameid,proto3" json:"gameid,omitempty"`
+	Moveinput []*MoveInput `protobuf:"bytes,3,rep,name=moveinput,proto3" json:"moveinput,omitempty"`
 }
 
 func (x *MoveInputs) Reset() {
 	*x = MoveInputs{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_api_proto_msgTypes[4]
+		mi := &file_api_proto_msgTypes[6]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -260,7 +376,7 @@ func (x *MoveInputs) String() string {
 func (*MoveInputs) ProtoMessage() {}
 
 func (x *MoveInputs) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[4]
+	mi := &file_api_proto_msgTypes[6]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -273,7 +389,7 @@ func (x *MoveInputs) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MoveInputs.ProtoReflect.Descriptor instead.
 func (*MoveInputs) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{4}
+	return file_api_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *MoveInputs) GetUserid() uint32 {
@@ -290,25 +406,11 @@ func (x *MoveInputs) GetGameid() uint32 {
 	return 0
 }
 
-func (x *MoveInputs) GetPawnid() uint32 {
+func (x *MoveInputs) GetMoveinput() []*MoveInput {
 	if x != nil {
-		return x.Pawnid
+		return x.Moveinput
 	}
-	return 0
-}
-
-func (x *MoveInputs) GetX() uint32 {
-	if x != nil {
-		return x.X
-	}
-	return 0
-}
-
-func (x *MoveInputs) GetY() uint32 {
-	if x != nil {
-		return x.Y
-	}
-	return 0
+	return nil
 }
 
 type MoveOutputs struct {
@@ -322,7 +424,7 @@ type MoveOutputs struct {
 func (x *MoveOutputs) Reset() {
 	*x = MoveOutputs{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_api_proto_msgTypes[5]
+		mi := &file_api_proto_msgTypes[7]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -335,7 +437,7 @@ func (x *MoveOutputs) String() string {
 func (*MoveOutputs) ProtoMessage() {}
 
 func (x *MoveOutputs) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[5]
+	mi := &file_api_proto_msgTypes[7]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -348,7 +450,7 @@ func (x *MoveOutputs) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MoveOutputs.ProtoReflect.Descriptor instead.
 func (*MoveOutputs) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{5}
+	return file_api_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *MoveOutputs) GetOK() bool {
@@ -367,7 +469,7 @@ var file_api_proto_rawDesc = []byte{
 	0x20, 0x01, 0x28, 0x0d, 0x52, 0x06, 0x75, 0x73, 0x65, 0x72, 0x69, 0x64, 0x22, 0x2b, 0x0a, 0x11,
 	0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x47, 0x61, 0x6d, 0x65, 0x4f, 0x75, 0x74, 0x70, 0x75, 0x74,
 	0x73, 0x12, 0x16, 0x0a, 0x06, 0x67, 0x61, 0x6d, 0x65, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28,
-	0x04, 0x52, 0x06, 0x67, 0x61, 0x6d, 0x65, 0x69, 0x64, 0x22, 0x40, 0x0a, 0x0e, 0x4a, 0x6f, 0x69,
+	0x0d, 0x52, 0x06, 0x67, 0x61, 0x6d, 0x65, 0x69, 0x64, 0x22, 0x40, 0x0a, 0x0e, 0x4a, 0x6f, 0x69,
 	0x6e, 0x47, 0x61, 0x6d, 0x65, 0x49, 0x6e, 0x70, 0x75, 0x74, 0x73, 0x12, 0x16, 0x0a, 0x06, 0x67,
 	0x61, 0x6d, 0x65, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x06, 0x67, 0x61, 0x6d,
 	0x65, 0x69, 0x64, 0x12, 0x16, 0x0a, 0x06, 0x75, 0x73, 0x65, 0x72, 0x69, 0x64, 0x18, 0x02, 0x20,
@@ -379,14 +481,22 @@ var file_api_proto_rawDesc = []byte{
 	0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x74, 0x65, 0x72, 0x72, 0x61, 0x69, 0x6e, 0x6d,
 	0x61, 0x70, 0x12, 0x20, 0x0a, 0x0b, 0x66, 0x65, 0x61, 0x74, 0x75, 0x72, 0x65, 0x64, 0x6d, 0x61,
 	0x70, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0b, 0x66, 0x65, 0x61, 0x74, 0x75, 0x72, 0x65,
-	0x64, 0x6d, 0x61, 0x70, 0x22, 0x70, 0x0a, 0x0a, 0x4d, 0x6f, 0x76, 0x65, 0x49, 0x6e, 0x70, 0x75,
-	0x74, 0x73, 0x12, 0x16, 0x0a, 0x06, 0x75, 0x73, 0x65, 0x72, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01,
-	0x28, 0x0d, 0x52, 0x06, 0x75, 0x73, 0x65, 0x72, 0x69, 0x64, 0x12, 0x16, 0x0a, 0x06, 0x67, 0x61,
-	0x6d, 0x65, 0x69, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x06, 0x67, 0x61, 0x6d, 0x65,
-	0x69, 0x64, 0x12, 0x16, 0x0a, 0x06, 0x70, 0x61, 0x77, 0x6e, 0x69, 0x64, 0x18, 0x03, 0x20, 0x01,
-	0x28, 0x0d, 0x52, 0x06, 0x70, 0x61, 0x77, 0x6e, 0x69, 0x64, 0x12, 0x0c, 0x0a, 0x01, 0x78, 0x18,
-	0x04, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x01, 0x78, 0x12, 0x0c, 0x0a, 0x01, 0x79, 0x18, 0x05, 0x20,
-	0x01, 0x28, 0x0d, 0x52, 0x01, 0x79, 0x22, 0x1d, 0x0a, 0x0b, 0x4d, 0x6f, 0x76, 0x65, 0x4f, 0x75,
+	0x64, 0x6d, 0x61, 0x70, 0x22, 0x40, 0x0a, 0x04, 0x4d, 0x6f, 0x76, 0x65, 0x12, 0x0c, 0x0a, 0x01,
+	0x78, 0x18, 0x02, 0x20, 0x01, 0x28, 0x05, 0x52, 0x01, 0x78, 0x12, 0x0c, 0x0a, 0x01, 0x79, 0x18,
+	0x03, 0x20, 0x01, 0x28, 0x05, 0x52, 0x01, 0x79, 0x12, 0x1c, 0x0a, 0x09, 0x64, 0x69, 0x72, 0x65,
+	0x63, 0x74, 0x69, 0x6f, 0x6e, 0x18, 0x04, 0x20, 0x01, 0x28, 0x05, 0x52, 0x09, 0x64, 0x69, 0x72,
+	0x65, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x22, 0x42, 0x0a, 0x09, 0x4d, 0x6f, 0x76, 0x65, 0x49, 0x6e,
+	0x70, 0x75, 0x74, 0x12, 0x16, 0x0a, 0x06, 0x70, 0x61, 0x77, 0x6e, 0x69, 0x64, 0x18, 0x03, 0x20,
+	0x01, 0x28, 0x0d, 0x52, 0x06, 0x70, 0x61, 0x77, 0x6e, 0x69, 0x64, 0x12, 0x1d, 0x0a, 0x04, 0x6d,
+	0x6f, 0x76, 0x65, 0x18, 0x04, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x09, 0x2e, 0x61, 0x70, 0x69, 0x2e,
+	0x4d, 0x6f, 0x76, 0x65, 0x52, 0x04, 0x6d, 0x6f, 0x76, 0x65, 0x22, 0x6a, 0x0a, 0x0a, 0x4d, 0x6f,
+	0x76, 0x65, 0x49, 0x6e, 0x70, 0x75, 0x74, 0x73, 0x12, 0x16, 0x0a, 0x06, 0x75, 0x73, 0x65, 0x72,
+	0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x06, 0x75, 0x73, 0x65, 0x72, 0x69, 0x64,
+	0x12, 0x16, 0x0a, 0x06, 0x67, 0x61, 0x6d, 0x65, 0x69, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0d,
+	0x52, 0x06, 0x67, 0x61, 0x6d, 0x65, 0x69, 0x64, 0x12, 0x2c, 0x0a, 0x09, 0x6d, 0x6f, 0x76, 0x65,
+	0x69, 0x6e, 0x70, 0x75, 0x74, 0x18, 0x03, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x0e, 0x2e, 0x61, 0x70,
+	0x69, 0x2e, 0x4d, 0x6f, 0x76, 0x65, 0x49, 0x6e, 0x70, 0x75, 0x74, 0x52, 0x09, 0x6d, 0x6f, 0x76,
+	0x65, 0x69, 0x6e, 0x70, 0x75, 0x74, 0x22, 0x1d, 0x0a, 0x0b, 0x4d, 0x6f, 0x76, 0x65, 0x4f, 0x75,
 	0x74, 0x70, 0x75, 0x74, 0x73, 0x12, 0x0e, 0x0a, 0x02, 0x4f, 0x4b, 0x18, 0x01, 0x20, 0x01, 0x28,
 	0x08, 0x52, 0x02, 0x4f, 0x4b, 0x32, 0xb7, 0x01, 0x0a, 0x0c, 0x53, 0x74, 0x72, 0x61, 0x74, 0x65,
 	0x67, 0x79, 0x47, 0x61, 0x6d, 0x65, 0x12, 0x3d, 0x0a, 0x0a, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65,
@@ -416,27 +526,31 @@ func file_api_proto_rawDescGZIP() []byte {
 	return file_api_proto_rawDescData
 }
 
-var file_api_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
+var file_api_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
 var file_api_proto_goTypes = []interface{}{
 	(*CreateGameInputs)(nil),  // 0: api.CreateGameInputs
 	(*CreateGameOutputs)(nil), // 1: api.CreateGameOutputs
 	(*JoinGameInputs)(nil),    // 2: api.JoinGameInputs
 	(*JoinGameOutputs)(nil),   // 3: api.JoinGameOutputs
-	(*MoveInputs)(nil),        // 4: api.MoveInputs
-	(*MoveOutputs)(nil),       // 5: api.MoveOutputs
+	(*Move)(nil),              // 4: api.Move
+	(*MoveInput)(nil),         // 5: api.MoveInput
+	(*MoveInputs)(nil),        // 6: api.MoveInputs
+	(*MoveOutputs)(nil),       // 7: api.MoveOutputs
 }
 var file_api_proto_depIdxs = []int32{
-	0, // 0: api.StrategyGame.CreateGame:input_type -> api.CreateGameInputs
-	2, // 1: api.StrategyGame.JoinGame:input_type -> api.JoinGameInputs
-	4, // 2: api.StrategyGame.MakeMove:input_type -> api.MoveInputs
-	1, // 3: api.StrategyGame.CreateGame:output_type -> api.CreateGameOutputs
-	3, // 4: api.StrategyGame.JoinGame:output_type -> api.JoinGameOutputs
-	5, // 5: api.StrategyGame.MakeMove:output_type -> api.MoveOutputs
-	3, // [3:6] is the sub-list for method output_type
-	0, // [0:3] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	4, // 0: api.MoveInput.move:type_name -> api.Move
+	5, // 1: api.MoveInputs.moveinput:type_name -> api.MoveInput
+	0, // 2: api.StrategyGame.CreateGame:input_type -> api.CreateGameInputs
+	2, // 3: api.StrategyGame.JoinGame:input_type -> api.JoinGameInputs
+	6, // 4: api.StrategyGame.MakeMove:input_type -> api.MoveInputs
+	1, // 5: api.StrategyGame.CreateGame:output_type -> api.CreateGameOutputs
+	3, // 6: api.StrategyGame.JoinGame:output_type -> api.JoinGameOutputs
+	7, // 7: api.StrategyGame.MakeMove:output_type -> api.MoveOutputs
+	5, // [5:8] is the sub-list for method output_type
+	2, // [2:5] is the sub-list for method input_type
+	2, // [2:2] is the sub-list for extension type_name
+	2, // [2:2] is the sub-list for extension extendee
+	0, // [0:2] is the sub-list for field type_name
 }
 
 func init() { file_api_proto_init() }
@@ -494,7 +608,7 @@ func file_api_proto_init() {
 			}
 		}
 		file_api_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*MoveInputs); i {
+			switch v := v.(*Move); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -506,6 +620,30 @@ func file_api_proto_init() {
 			}
 		}
 		file_api_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*MoveInput); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_api_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*MoveInputs); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_api_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*MoveOutputs); i {
 			case 0:
 				return &v.state
@@ -524,7 +662,7 @@ func file_api_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_api_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   6,
+			NumMessages:   8,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

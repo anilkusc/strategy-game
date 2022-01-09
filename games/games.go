@@ -24,6 +24,7 @@ type Game struct {
 	User1ID uint
 	User2ID uint
 	BoardID uint
+	Round   uint16
 	Status  int8 // -2: 1 User Ready,-1: Started,0: Draw , 1: User1 is winner , 2: User2 is winner
 }
 

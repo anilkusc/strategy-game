@@ -85,3 +85,16 @@ func (b *Board) CreateBoard(db *gorm.DB, gameid uint) error {
 	}
 	return nil
 }
+
+func (b *Board) MakeMove(db *gorm.DB) error {
+	err := b.Read(db)
+	if err != nil {
+		return err
+	}
+
+	err = b.Update(db)
+	if err != nil {
+		return err
+	}
+	return nil
+}

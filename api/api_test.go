@@ -77,7 +77,7 @@ func TestCreateGame(t *testing.T) {
 		if test.err != err {
 			t.Errorf("Error is: %v . Expected: %v", err, test.err)
 		}
-		if resp.Gameid != test.gameid {
+		if uint64(resp.Gameid) != test.gameid {
 			t.Errorf("Result is: %v . Expected: %v", resp.Gameid, test.gameid)
 		}
 
@@ -131,6 +131,67 @@ func TestJoinGame(t *testing.T) {
 		}
 		if resp.Featuredmap != test.featuredmap {
 			t.Errorf("Result is: %v . Expected: %v", resp.Featuredmap, test.featuredmap)
+		}
+
+	}
+	Destruct()
+}
+func TestMakeMove(t *testing.T) {
+	a := Construct()
+	game := games.Game{}
+	game.Create(a.DB)
+	type Move struct {
+		x         int32
+		y         int32
+		direction int32
+	}
+	type MoveInputs struct {
+		userid uint32
+		gameid uint32
+		pawnid uint32
+		moves  []Move
+	}
+	tests := []struct {
+		MoveInputs []MoveInputs
+		output     bool
+		err        error
+	}{
+		{
+			MoveInputs: []MoveInputs{
+				{pawnid: 1, moves: []Move{{x: 1, y: 0, direction: 0}}},
+			},
+			output: true,
+			err:    nil,
+		},
+	}
+	ctx := context.Background()
+	conn, err := grpc.DialContext(ctx, "bufnet", grpc.WithContextDialer(bufDialer), grpc.WithInsecure())
+	if err != nil {
+		t.Fatalf("Failed to dial bufnet: %v", err)
+	}
+	defer conn.Close()
+	client := protos.NewStrategyGameClient(conn)
+
+	for _, test := range tests {
+		var moves []*protos.Move
+		moveinput := []*protos.MoveInput{}
+		for _, elements := range test.MoveInputs {
+			moves = []*protos.Move{}
+
+			for _, el := range elements.moves {
+				moves = append(moves, &protos.Move{X: el.x, Y: el.y, Direction: el.direction})
+			}
+			moveinput = append(moveinput, &protos.MoveInput{Pawnid: elements.gameid, Move: moves})
+		}
+
+		req := &protos.MoveInputs{Moveinput: moveinput, Userid: 1, Gameid: 1}
+
+		resp, err := client.MakeMove(ctx, req)
+		if test.err != err {
+			t.Errorf("Error is: %v . Expected: %v", err, test.err)
+		}
+		if resp.OK != test.output {
+			t.Errorf("Result is: %v . Expected: %v", resp.OK, test.output)
 		}
 
 	}
