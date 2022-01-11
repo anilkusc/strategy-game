@@ -3,7 +3,6 @@ package games
 import (
 	"strategy-game/boards"
 	"strategy-game/pawns"
-	"testing"
 	"time"
 
 	"gorm.io/driver/sqlite"
@@ -33,47 +32,4 @@ func Destruct() {
 	db.Exec("DROP TABLE games")
 	db.Exec("DROP TABLE boards")
 	db.Exec("DROP TABLE pawns")
-}
-
-func TestCreateNewGame(t *testing.T) {
-	db, game := Construct()
-	game.ID = 1
-	tests := []struct {
-		input Game
-		err   error
-	}{
-		{
-			input: game,
-			err:   nil,
-		},
-	}
-	for _, test := range tests {
-		err := game.CreateNewGame(db, game.ID)
-		if test.err != err {
-			t.Errorf("Error is: %v . Expected: %v", err, test.err)
-		}
-	}
-	Destruct()
-}
-func TestJoinGame(t *testing.T) {
-	db, game := Construct()
-	game.ID = 1
-	game.CreateNewGame(db, game.ID)
-
-	tests := []struct {
-		input uint
-		err   error
-	}{
-		{
-			input: 2,
-			err:   nil,
-		},
-	}
-	for _, test := range tests {
-		err := game.JoinGame(db, test.input)
-		if test.err != err {
-			t.Errorf("Error is: %v . Expected: %v", err, test.err)
-		}
-	}
-	Destruct()
 }

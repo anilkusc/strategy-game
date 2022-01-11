@@ -11,7 +11,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func Construct() *gorm.DB {
+func Construct() (*gorm.DB, games.Game) {
 	var db *gorm.DB
 	var game = games.Game{
 		Model: gorm.Model{
@@ -40,40 +40,61 @@ func TestCreateNewGame(t *testing.T) {
 	db, game := Construct()
 	game.ID = 1
 	tests := []struct {
-		input Game
-		err   error
+		input  games.Game
+		output uint
+		err    error
 	}{
 		{
-			input: game,
-			err:   nil,
+			input:  game,
+			output: 1,
+			err:    nil,
 		},
 	}
 	for _, test := range tests {
-		err := game.CreateNewGame(db, game.ID)
+		gameid, err := CreateNewGame(db, game.ID)
 		if test.err != err {
 			t.Errorf("Error is: %v . Expected: %v", err, test.err)
+		}
+		if test.output != gameid {
+			t.Errorf("Result is: %v . Expected: %v", gameid, test.output)
 		}
 	}
 	Destruct()
 }
 func TestJoinGame(t *testing.T) {
-	db, game := Construct()
-	game.ID = 1
-	game.CreateNewGame(db, game.ID)
+	db, _ := Construct()
+	CreateNewGame(db, 1)
 
 	tests := []struct {
-		input uint
-		err   error
+		user2id            uint
+		gameid             uint
+		output_user1id     uint
+		output_terrainmap  string
+		output_featuredmap string
+		err                error
 	}{
 		{
-			input: 2,
-			err:   nil,
+			user2id:            2,
+			gameid:             1,
+			output_user1id:     1,
+			output_terrainmap:  "[[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,2,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]]",
+			output_featuredmap: "[[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]]",
+			err:                nil,
 		},
 	}
 	for _, test := range tests {
-		err := game.JoinGame(db, test.input)
+		user1id, terrain, featuredmap, err := JoinAGame(db, test.user2id, test.gameid)
 		if test.err != err {
 			t.Errorf("Error is: %v . Expected: %v", err, test.err)
+		}
+		if test.output_user1id != user1id {
+			t.Errorf("Result is: %v . Expected: %v", user1id, test.output_user1id)
+		}
+		if test.output_terrainmap != terrain {
+			t.Errorf("Result is: %v . Expected: %v", terrain, test.output_terrainmap)
+		}
+		if test.output_featuredmap != featuredmap {
+			t.Errorf("Result is: %v . Expected: %v", featuredmap, test.output_featuredmap)
 		}
 	}
 	Destruct()
