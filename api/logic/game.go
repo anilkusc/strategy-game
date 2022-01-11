@@ -1,7 +1,6 @@
 package logic
 
 import (
-	"fmt"
 	"strategy-game/api/protos"
 	"strategy-game/boards"
 	"strategy-game/boards/moves"
@@ -12,6 +11,7 @@ import (
 	"gorm.io/gorm"
 )
 
+//TODO : add logs here for != nil expressions.
 func CreateNewGame(db *gorm.DB, userid uint) (uint, error) {
 	var err error
 	game := games.Game{
@@ -131,10 +131,29 @@ func MakeMoves(db *gorm.DB, in *protos.MoveInputs) error {
 			}
 		}
 	}
-
 	if gamestatus == -5 {
+		var movesList []moves.Move
+		var user1Moves []moves.Move
+		var user2Moves []moves.Move
+		m := moves.Move{
+			GameID: game.ID,
+			Round:  game.Round,
+		}
+		movesList, err = m.List(db)
+		if err != nil {
+			log.Error(err)
+			return err
+		}
 		//TODO play the game
-		fmt.Println("game")
+		game.Round++
+	} else {
+		game.Status = gamestatus
+	}
+
+	err = game.Update(db)
+	if err != nil {
+		log.Error(err)
+		return err
 	}
 	return nil
 }
