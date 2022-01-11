@@ -3,55 +3,33 @@ package api
 import (
 	"context"
 	"strategy-game/api/protos"
-	"strategy-game/boards"
 	"strategy-game/boards/moves"
 	"strategy-game/games"
+	logic "strategy-game/logic"
 
 	log "github.com/sirupsen/logrus"
-	"gorm.io/gorm"
 )
 
 func (a *App) CreateGame(ctx context.Context, in *protos.CreateGameInputs) (*protos.CreateGameOutputs, error) {
 
-	game := games.Game{
-		User1ID: uint(in.Userid),
-		User2ID: 0,
-		Status:  -2,
-	}
-
-	err := game.CreateNewGame(a.DB, game.User1ID)
+	err, gameid := logic.CreateNewGame(a.DB, uint(in.Userid))
 	if err != nil {
 		log.Error(err)
 		return &protos.CreateGameOutputs{Gameid: 0}, err
 	}
-	return &protos.CreateGameOutputs{Gameid: uint32(game.ID)}, nil
+	return &protos.CreateGameOutputs{Gameid: uint32(gameid)}, nil
 
 }
 
 func (a *App) JoinGame(ctx context.Context, in *protos.JoinGameInputs) (*protos.JoinGameOutputs, error) {
-	game := games.Game{
-		Model: gorm.Model{
-			ID: uint(in.Gameid),
-		},
-	}
 
-	err := game.JoinGame(a.DB, uint(in.Userid))
-	if err != nil {
-		log.Error(err)
-		return &protos.JoinGameOutputs{Otherusersid: 0, Terrainmap: "0", Featuredmap: "0"}, err
-	}
-	board := boards.Board{
-		Model: gorm.Model{
-			ID: uint(in.Gameid),
-		},
-	}
-	err = board.Read(a.DB)
+	user1ID, terrain, featured, err := logic.JoinAGame(a.DB, uint(in.Userid), uint(in.Gameid))
 	if err != nil {
 		log.Error(err)
 		return &protos.JoinGameOutputs{Otherusersid: 0, Terrainmap: "0", Featuredmap: "0"}, err
 	}
 
-	return &protos.JoinGameOutputs{Otherusersid: uint32(game.User1ID), Terrainmap: board.TerrainJson, Featuredmap: board.FeaturedMapJson}, err
+	return &protos.JoinGameOutputs{Otherusersid: uint32(user1ID), Terrainmap: terrain, Featuredmap: featured}, nil
 
 }
 

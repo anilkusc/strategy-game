@@ -16,7 +16,7 @@ type Boarder interface {
 	ArrayToJson([][]int16) (string, error)
 	JsonToArray(string) ([][]int16, error)
 	DeployPawn(*gorm.DB, uint, int16, int16) error
-	CreateBoard(*gorm.DB, uint) error
+	CreateBoard(*gorm.DB) error
 }
 
 type Board struct {
@@ -53,7 +53,7 @@ func (b *Board) DeployPawn(db *gorm.DB, pawnID uint, X int16, Y int16) error {
 	return nil
 }
 
-func (b *Board) CreateBoard(db *gorm.DB, gameid uint) error {
+func (b *Board) CreateBoard(db *gorm.DB) error {
 	switch b.Type {
 	case "flat":
 		var err error
