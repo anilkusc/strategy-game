@@ -1,10 +1,14 @@
 package logic
 
 import (
+	"fmt"
+	"strategy-game/api/protos"
 	"strategy-game/boards"
+	"strategy-game/boards/moves"
 	"strategy-game/games"
 	"strategy-game/pawns"
 
+	log "github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 )
 
@@ -106,4 +110,31 @@ func JoinAGame(db *gorm.DB, user2id uint, gameid uint) (uint, string, string, er
 	}
 	return game.User1ID, board.TerrainJson, board.FeaturedMapJson, nil
 
+}
+func MakeMoves(db *gorm.DB, in *protos.MoveInputs) error {
+	var gamestatus int8
+	game := games.Game{}
+	game.ID = uint(in.Gameid)
+	err := game.Read(db)
+	if err != nil {
+		log.Error(err)
+		return err
+	}
+
+	for _, input := range in.Moveinput {
+		for _, move := range input.Move {
+			m := moves.Move{}
+			gamestatus, err = m.AppendMove(db, uint(in.Gameid), uint(in.Userid), uint(input.Pawnid), int16(move.X), int16(move.Y), uint8(move.Direction), game.Round, game.BoardID, game.Status, game.User1ID, game.User2ID)
+			if err != nil {
+				log.Error(err)
+				return err
+			}
+		}
+	}
+
+	if gamestatus == -5 {
+		//TODO play the game
+		fmt.Println("game")
+	}
+	return nil
 }
