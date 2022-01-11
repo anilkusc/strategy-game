@@ -67,6 +67,16 @@ func (a *App) MakeMove(ctx context.Context, in *protos.MoveInputs) (*protos.Move
 			}
 		}
 	}
+	game := games.Game{}
+	game.ID = uint(in.Gameid)
+	err := game.Read(a.DB)
+	if err != nil {
+		log.Error(err)
+		return &protos.MoveOutputs{OK: false}, nil
+	}
+	if game.Status == -5 {
+		//
+	}
 	return &protos.MoveOutputs{OK: true}, nil
 
 }

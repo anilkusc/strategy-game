@@ -1,7 +1,6 @@
 package moves
 
 import (
-	"strategy-game/games"
 	"testing"
 	"time"
 
@@ -26,7 +25,7 @@ func Construct() (*gorm.DB, Move) {
 		Direction: 1,
 	}
 	db, _ = gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
-	db.AutoMigrate(&Move{}, &games.Game{})
+	db.AutoMigrate(&Move{})
 	return db, move
 }
 func Destruct() {
@@ -35,23 +34,43 @@ func Destruct() {
 }
 func TestAppendMove(t *testing.T) {
 	db, move := Construct()
-	game := games.Game{}
-	game.Create(db)
+
+	type ExtraParams struct {
+		round      uint16
+		boardid    uint
+		gamestatus int8
+		user1id    uint
+		user2id    uint
+	}
 	tests := []struct {
-		input Move
-		err   error
+		input  Move
+		input2 ExtraParams
+		result int8
+		err    error
 	}{
 		{
 			input: move,
-			err:   nil,
+			input2: ExtraParams{
+				round:      1,
+				boardid:    1,
+				gamestatus: -1,
+				user1id:    1,
+				user2id:    2,
+			},
+			result: -3,
+			err:    nil,
 		},
 	}
 	for _, test := range tests {
-		err := move.AppendMove(db, move.GameID, move.BoardID, move.PawnID, move.X, move.Y, move.Direction)
+		in := test.input
+		in2 := test.input2
+		res, err := move.AppendMove(db, in.GameID, in.BoardID, in.PawnID, in.X, in.Y, in.Direction, in2.round, in2.boardid, in2.gamestatus, in2.user1id, in2.user2id)
 		if test.err != err {
 			t.Errorf("Error is: %v . Expected: %v", err, test.err)
 		}
-
+		if test.result != res {
+			t.Errorf("Result is: %v . Expected: %v", res, test.result)
+		}
 	}
 
 	Destruct()

@@ -1,68 +1,64 @@
 package moves
 
 import (
-	"strategy-game/games"
+	"errors"
 
 	"gorm.io/gorm"
 )
 
-type IMove interface {
+type Mover interface {
 	Create(*gorm.DB) error
 	Read(*gorm.DB) error
 	Update(*gorm.DB) error
 	Delete(*gorm.DB) error
 	HardDelete(*gorm.DB) error
 	List(*gorm.DB) ([]Move, error)
-	AppendMove(*gorm.DB, uint, uint, uint, int16, int16, uint8) error
+	AppendMove(*gorm.DB, uint, uint, uint, int16, int16, uint8) (error, int8)
 }
-
-//  message Move{
-//	uint32 pawnid=1;
-//	uint32 x=2;
-//	uint32 y=3;
-//	uint32 direction=4;
-//  }
-//
-//  message MoveInputs {
-//	uint32 userid=1;
-//	uint32 gameid=2;
-//	repeated Move move=3;
-//  }
-//
-//  message MoveOutputs {
-//	bool OK=1;
-//  }
 
 type Move struct {
 	gorm.Model
 	GameID    uint
 	BoardID   uint
 	PawnID    uint
+	UserID    uint
 	X         int16
 	Y         int16
 	Direction uint8
 	Round     uint16
 }
 
-func (m *Move) AppendMove(db *gorm.DB, gameid uint, boardid uint, pawnid uint, x int16, y int16, direction uint8) error {
-	game := games.Game{}
-	game.ID = gameid
-	err := game.Read(db)
-	if err != nil {
-		return err
-	}
+func (m *Move) AppendMove(db *gorm.DB, gameid uint, userid uint, pawnid uint, x int16, y int16, direction uint8, round uint16, boardid uint, gamestatus int8, user1id uint, user2id uint) (int8, error) {
+
 	move := Move{
 		GameID:    gameid,
 		BoardID:   boardid,
 		PawnID:    pawnid,
+		UserID:    userid,
 		X:         x,
 		Y:         y,
 		Direction: direction,
-		Round:     game.Round,
+		Round:     round,
 	}
-	err = move.Create(db)
+
+	if gamestatus == -3 && userid != user1id || gamestatus == -2 && userid != user2id {
+		return -100, errors.New("user has already sent the moves")
+	}
+	err := move.Create(db)
 	if err != nil {
-		return err
+		return -100, err
 	}
-	return nil
+
+	switch gamestatus {
+	case -3, -4:
+		gamestatus = -5
+	case -1:
+		if userid == user2id {
+			gamestatus = -4
+		} else if userid == user1id {
+			gamestatus = -3
+		}
+	}
+
+	return gamestatus, nil
 }

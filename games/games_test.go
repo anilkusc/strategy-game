@@ -77,24 +77,3 @@ func TestJoinGame(t *testing.T) {
 	}
 	Destruct()
 }
-func TestEnd(t *testing.T) {
-	db, game := Construct()
-	game.Create(db)
-
-	tests := []struct {
-		input Game
-		err   error
-	}{
-		{
-			input: game,
-			err:   nil,
-		},
-	}
-	for _, test := range tests {
-		err := game.End(db, 1)
-		if test.err != err {
-			t.Errorf("Error is: %v . Expected: %v", err, test.err)
-		}
-	}
-	Destruct()
-}
