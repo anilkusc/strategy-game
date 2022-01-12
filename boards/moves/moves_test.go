@@ -75,3 +75,58 @@ func TestAppendMove(t *testing.T) {
 
 	Destruct()
 }
+
+/*
+func TestSeperateMoves(t *testing.T) {
+	db, move := Construct()
+	move.Create(db)
+	move2 := move
+	move2.UserID = 2
+	move2.Create(db)
+
+	type ExtraParams struct {
+		round   uint16
+		gameid  uint
+		boardid uint
+		user1id uint
+		user2id uint
+	}
+	tests := []struct {
+		input             ExtraParams
+		maxlength_output  int
+		user1moves_output []Move
+		user2moves_output []Move
+		err               error
+	}{
+		{
+			input: ExtraParams{
+				gameid:  1,
+				round:   1,
+				boardid: 1,
+				user1id: 1,
+				user2id: 2,
+			},
+			maxlength_output:  0,
+			user1moves_output: []Move{move},
+			user2moves_output: []Move{move2},
+			err:               nil,
+		},
+	}
+	for _, test := range tests {
+		in := test.input
+		maxlength, user1moves, user2moves, err := move.SeperateMoves(db, in.gameid, in.round, in.user2id, in.user2id)
+		if test.err != err {
+			t.Errorf("Error is: %v . Expected: %v", err, test.err)
+		}
+		if maxlength != test.maxlength_output {
+			t.Errorf("Result is: %v . Expected: %v", maxlength, test.maxlength_output)
+		}
+		if reflect.DeepEqual(user1moves, test.user1moves_output) == false {
+			t.Errorf("Result is: %v . Expected: %v", user1moves, test.user1moves_output)
+		}
+		if reflect.DeepEqual(user2moves, test.user2moves_output) == false {
+			t.Errorf("Result is: %v . Expected: %v", user2moves, test.user2moves_output)
+		}
+	}
+}
+*/

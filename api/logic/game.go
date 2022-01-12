@@ -149,75 +149,44 @@ func MakeMoves(db *gorm.DB, in *protos.MoveInputs) error {
 		}
 	}
 	if gamestatus == -5 {
-		var movesList []moves.Move
-		var user1Moves []moves.Move
-		var user2Moves []moves.Move
-		m := moves.Move{
-			GameID: game.ID,
-			Round:  game.Round,
-		}
-		movesList, err = m.List(db)
+		pawnList, err := board.DetectPawns(db)
 		if err != nil {
 			log.Error(err)
 			return err
 		}
 
-		for _, mv := range movesList {
-			if mv.UserID == game.User1ID {
-				user1Moves = append(user1Moves, mv)
-			} else {
-				user2Moves = append(user2Moves, mv)
-			}
-		}
-		var maxlength int
-		if len(user1Moves) > len(user2Moves) {
-			maxlength = len(user1Moves)
-		} else {
-			maxlength = len(user2Moves)
+		movesWillPlay := moves.Move{GameID: game.ID, Round: game.Round}
+		movesWillPlayList, err := movesWillPlay.List(db)
+		if err != nil {
+			log.Error(err)
+			return err
 		}
 
-		for i := 0; i < maxlength; i++ {
-			pawn1 := pawns.Pawn{}
-			pawn2 := pawns.Pawn{}
-			pawn1.ID = user1Moves[i].PawnID
-			pawn2.ID = user2Moves[i].PawnID
-			err = pawn1.Read(db)
+		for _, pawnid := range pawnList {
+			pawn := pawns.Pawn{Model: gorm.Model{ID: pawnid}}
+			err = pawn.Read(db)
 			if err != nil {
 				log.Error(err)
 				return err
 			}
-			err = pawn2.Read(db)
-			if err != nil {
-				log.Error(err)
-				return err
-			}
-
-			board.Terrain[pawn1.Y][pawn1.X] = 0
-			pawn1.X = pawn1.X + user1Moves[i].X
-			pawn1.Y = pawn1.Y + user1Moves[i].Y
-			board.Terrain[pawn1.Y][pawn1.X] = int16(pawn1.ID)
-			err = pawn1.Update(db)
-			if err != nil {
-				log.Error(err)
-				return err
-			}
-			board.Terrain[pawn2.Y][pawn2.X] = 0
-			pawn2.X = pawn2.X + user2Moves[i].X
-			pawn2.Y = pawn2.Y + user2Moves[i].Y
-			board.Terrain[pawn2.Y][pawn2.X] = int16(pawn2.ID)
-
-			err = pawn2.Update(db)
-			if err != nil {
-				log.Error(err)
-				return err
+			for _, moveWillPlayList := range movesWillPlayList {
+				if moveWillPlayList.PawnID == pawnid {
+					err = board.MovePawnTo(pawn.X, pawn.Y, pawn.X+moveWillPlayList.X, pawn.Y+moveWillPlayList.Y)
+					if err != nil {
+						log.Error(err)
+						return err
+					}
+					break
+				}
 			}
 
 		}
-		game.Status = gamestatus
+
 		game.Round++
-	} else {
-		game.Status = gamestatus
 	}
+
+	game.Status = gamestatus
+
 	err = board.Update(db)
 	if err != nil {
 		log.Error(err)

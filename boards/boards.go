@@ -16,6 +16,8 @@ type Boarder interface {
 	ArrayToJson([][]int16) (string, error)
 	JsonToArray(string) ([][]int16, error)
 	DeployPawn(*gorm.DB, uint, int16, int16) error
+	DetectPawns(*gorm.DB) ([]uint, error)
+	MovePawnTo(int16, int16, int16, int16) error
 	CreateBoard(*gorm.DB) error
 }
 
@@ -36,7 +38,7 @@ func (b *Board) DeployPawn(db *gorm.DB, pawnID uint, X int16, Y int16) error {
 	if err != nil {
 		return err
 	}
-	if b.Terrain[Y][X] == 0 {
+	if b.Terrain[Y][X] == b.FeaturedMap[Y][X] {
 		b.Terrain[Y][X] = int16(pawnID)
 		b.TerrainJson, err = b.ArrayToJson(b.Terrain)
 		if err != nil {
@@ -83,5 +85,38 @@ func (b *Board) CreateBoard(db *gorm.DB) error {
 	if err != nil {
 		return err
 	}
+	return nil
+}
+
+func (b *Board) DetectPawns(db *gorm.DB) ([]uint, error) {
+	err := b.Read(db)
+	if err != nil {
+		return []uint{0}, err
+	}
+	var pawns []uint
+	for i, terrain := range b.Terrain {
+		for j, point := range terrain {
+			if point != b.FeaturedMap[i][j] {
+				pawns = append(pawns, uint(point))
+			}
+		}
+	}
+	return pawns, nil
+}
+
+func (b *Board) MovePawnTo(fromX int16, fromY int16, toX int16, toY int16) error {
+	var err error
+	if b.Terrain[toY][toX] == b.FeaturedMap[toY][toX] && b.Terrain[fromY][fromX] != b.FeaturedMap[fromY][fromX] {
+		pawn := b.Terrain[fromY][fromX]
+		b.Terrain[fromY][fromX] = b.FeaturedMap[fromY][fromX]
+		b.Terrain[toY][toX] = pawn
+		b.TerrainJson, err = b.ArrayToJson(b.Terrain)
+		if err != nil {
+			return err
+		}
+	} else {
+		return errors.New("cannot move pawn")
+	}
+
 	return nil
 }

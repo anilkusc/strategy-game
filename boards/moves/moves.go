@@ -14,6 +14,7 @@ type Mover interface {
 	HardDelete(*gorm.DB) error
 	List(*gorm.DB) ([]Move, error)
 	AppendMove(*gorm.DB, uint, uint, uint, int16, int16, uint8) (error, int8)
+	SeperateMoves(*gorm.DB, uint, uint16, uint, uint) (int, []Move, []Move, error)
 }
 
 type Move struct {
@@ -61,4 +62,36 @@ func (m *Move) AppendMove(db *gorm.DB, gameid uint, userid uint, pawnid uint, x 
 	}
 
 	return gamestatus, nil
+}
+
+func (m *Move) SeperateMoves(db *gorm.DB, gameid uint, round uint16, user1id uint, user2id uint) (int, []Move, []Move, error) {
+
+	var movesList []Move
+	var user1Moves []Move
+	var user2Moves []Move
+	mymove := Move{
+		GameID: gameid,
+		Round:  round,
+	}
+	movesList, err := mymove.List(db)
+	if err != nil {
+		return 0, user1Moves, user2Moves, err
+	}
+
+	for _, mv := range movesList {
+		if mv.UserID == user1id {
+			user1Moves = append(user1Moves, mv)
+		} else {
+			user2Moves = append(user2Moves, mv)
+		}
+	}
+
+	var maxlength int
+	if len(user1Moves) > len(user2Moves) {
+		maxlength = len(user1Moves)
+	} else {
+		maxlength = len(user2Moves)
+	}
+
+	return maxlength, user1Moves, user2Moves, nil
 }

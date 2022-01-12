@@ -145,3 +145,56 @@ func TestCreateBoard(t *testing.T) {
 	}
 	Destruct()
 }
+func TestDetectPawns(t *testing.T) {
+	db, board := Construct()
+	board.Create(db)
+	board.DeployPawn(db, 1, 1, 1)
+	tests := []struct {
+		output []uint
+		err    error
+	}{
+		{
+			output: []uint{1},
+			err:    nil,
+		},
+	}
+	for _, test := range tests {
+		res, err := board.DetectPawns(db)
+		if test.err != err {
+			t.Errorf("Error is: %v . Expected: %v", err, test.err)
+		}
+		if reflect.DeepEqual(test.output, res) == false {
+			t.Errorf("Result is: %v . Expected: %v", res, test.output)
+		}
+	}
+	Destruct()
+}
+
+func TestMovePawnto(t *testing.T) {
+	db, board := Construct()
+	board.Create(db)
+	board.DeployPawn(db, 1, 1, 1)
+	tests := []struct {
+		input1 int16
+		input2 int16
+		input3 int16
+		input4 int16
+		err    error
+	}{
+		{
+			input1: 1,
+			input2: 1,
+			input3: 2,
+			input4: 1,
+			err:    nil,
+		},
+	}
+	for _, test := range tests {
+		err := board.MovePawnTo(test.input1, test.input2, test.input3, test.input4)
+		if test.err != err {
+			t.Errorf("Error is: %v . Expected: %v", err, test.err)
+		}
+
+	}
+	Destruct()
+}
