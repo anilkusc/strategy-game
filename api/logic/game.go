@@ -22,11 +22,13 @@ func CreateNewGame(db *gorm.DB, userid uint) (uint, error) {
 
 	err = game.Create(db)
 	if err != nil {
+		log.Error(err)
 		return 0, err
 	}
 
 	err = game.Read(db)
 	if err != nil {
+		log.Error(err)
 		return 0, err
 	}
 
@@ -36,11 +38,13 @@ func CreateNewGame(db *gorm.DB, userid uint) (uint, error) {
 	}
 	err = board.CreateBoard(db)
 	if err != nil {
+		log.Error(err)
 		return 0, err
 	}
 
 	err = board.Read(db)
 	if err != nil {
+		log.Error(err)
 		return 0, err
 	}
 
@@ -54,21 +58,25 @@ func CreateNewGame(db *gorm.DB, userid uint) (uint, error) {
 	}
 	err = pawn.InitiatePawn()
 	if err != nil {
+		log.Error(err)
 		return 0, err
 	}
 	err = pawn.Create(db)
 	if err != nil {
+		log.Error(err)
 		return 0, err
 	}
 
 	game.BoardID = board.ID
 	err = game.Update(db)
 	if err != nil {
+		log.Error(err)
 		return 0, err
 	}
 
 	err = board.DeployPawn(db, pawn.ID, pawn.X, pawn.Y)
 	if err != nil {
+		log.Error(err)
 		return 0, err
 	}
 	return game.ID, nil
@@ -81,6 +89,7 @@ func JoinAGame(db *gorm.DB, user2id uint, gameid uint) (uint, string, string, er
 	}
 	err := game.Read(db)
 	if err != nil {
+		log.Error(err)
 		return 0, "", "", err
 	}
 	game.Status = -1
@@ -96,32 +105,37 @@ func JoinAGame(db *gorm.DB, user2id uint, gameid uint) (uint, string, string, er
 	}
 	err = pawn.InitiatePawn()
 	if err != nil {
+		log.Error(err)
 		return 0, "", "", err
 	}
 	err = pawn.Create(db)
 	if err != nil {
+		log.Error(err)
 		return 0, "", "", err
 	}
 	board := boards.Board{Model: gorm.Model{ID: game.BoardID}}
 
 	err = board.Read(db)
 	if err != nil {
+		log.Error(err)
 		return 0, "", "", err
 	}
 	err = board.DeployPawn(db, pawn.ID, pawn.X, pawn.Y)
 	if err != nil {
+		log.Error(err)
 		return 0, "", "", err
 	}
 
 	err = game.Update(db)
 	if err != nil {
+		log.Error(err)
 		return 0, "", "", err
 	}
 
 	return game.User1ID, board.TerrainJson, board.FeaturedMapJson, nil
 
 }
-func MakeMoves(db *gorm.DB, in *protos.MoveInputs) error {
+func MakeMoves(db *gorm.DB, in *protos.MoveInputs) (string, error) {
 	var gamestatus int8
 
 	game := games.Game{}
@@ -129,14 +143,14 @@ func MakeMoves(db *gorm.DB, in *protos.MoveInputs) error {
 	err := game.Read(db)
 	if err != nil {
 		log.Error(err)
-		return err
+		return "", err
 	}
 	board := boards.Board{}
 	board.ID = game.BoardID
 	err = board.Read(db)
 	if err != nil {
 		log.Error(err)
-		return err
+		return "", err
 	}
 	for _, input := range in.Moveinput {
 		for _, move := range input.Move {
@@ -144,7 +158,7 @@ func MakeMoves(db *gorm.DB, in *protos.MoveInputs) error {
 			gamestatus, err = m.AppendMove(db, uint(in.Gameid), uint(in.Userid), uint(input.Pawnid), int16(move.X), int16(move.Y), uint8(move.Direction), game.Round, game.BoardID, game.Status, game.User1ID, game.User2ID)
 			if err != nil {
 				log.Error(err)
-				return err
+				return "", err
 			}
 		}
 	}
@@ -152,14 +166,14 @@ func MakeMoves(db *gorm.DB, in *protos.MoveInputs) error {
 		pawnList, err := board.DetectPawns(db)
 		if err != nil {
 			log.Error(err)
-			return err
+			return "", err
 		}
 
 		movesWillPlay := moves.Move{GameID: game.ID, Round: game.Round}
 		movesWillPlayList, err := movesWillPlay.List(db)
 		if err != nil {
 			log.Error(err)
-			return err
+			return "", err
 		}
 
 		for _, pawnid := range pawnList {
@@ -167,35 +181,45 @@ func MakeMoves(db *gorm.DB, in *protos.MoveInputs) error {
 			err = pawn.Read(db)
 			if err != nil {
 				log.Error(err)
-				return err
+				return "", err
 			}
+
 			for _, moveWillPlayList := range movesWillPlayList {
 				if moveWillPlayList.PawnID == pawnid {
-					err = board.MovePawnTo(pawn.X, pawn.Y, pawn.X+moveWillPlayList.X, pawn.Y+moveWillPlayList.Y)
+					newX := pawn.X + moveWillPlayList.X
+					newY := pawn.Y + moveWillPlayList.Y
+					err = board.MovePawnTo(pawn.X, pawn.Y, newX, newY)
 					if err != nil {
 						log.Error(err)
-						return err
+						return "", err
+					}
+					pawn.X = newX
+					pawn.Y = newY
+					err = pawn.Update(db)
+					if err != nil {
+						log.Error(err)
+						return "", err
 					}
 					break
 				}
 			}
 
 		}
-
+		game.Status = -1
 		game.Round++
+	} else {
+		game.Status = gamestatus
 	}
-
-	game.Status = gamestatus
 
 	err = board.Update(db)
 	if err != nil {
 		log.Error(err)
-		return err
+		return "", err
 	}
 	err = game.Update(db)
 	if err != nil {
 		log.Error(err)
-		return err
+		return "", err
 	}
-	return nil
+	return board.TerrainJson, nil
 }

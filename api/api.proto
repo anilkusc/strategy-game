@@ -36,7 +36,7 @@ message MoveInputs{
 }
 
 message MoveOutputs {
-  bool OK=1;
+  string Terrain=1;
 }
  
 service StrategyGame {
