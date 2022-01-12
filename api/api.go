@@ -33,12 +33,12 @@ func (a *App) JoinGame(ctx context.Context, in *protos.JoinGameInputs) (*protos.
 
 func (a *App) MakeMove(ctx context.Context, in *protos.MoveInputs) (*protos.MoveOutputs, error) {
 
-	terrain, err := logic.MakeMoves(a.DB, in)
+	err := logic.MakeMoves(a.DB, in)
 	if err != nil {
 		log.Error(err)
-		return &protos.MoveOutputs{Terrain: ""}, err
+		return &protos.MoveOutputs{OK: false}, err
 	}
 
-	return &protos.MoveOutputs{Terrain: terrain}, nil
+	return &protos.MoveOutputs{OK: true}, nil
 
 }
