@@ -26,6 +26,8 @@ type Pawn struct {
 	GameID    uint
 	BoardID   uint
 	Direction uint8 // 1 right , 2 up , 3 left , 4 down
+	X         int16
+	Y         int16
 	Health    int16
 	Defense   int16
 	Attack    int16

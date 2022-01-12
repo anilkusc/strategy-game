@@ -49,6 +49,8 @@ func CreateNewGame(db *gorm.DB, userid uint) (uint, error) {
 		GameID:  game.ID,
 		BoardID: board.ID,
 		Type:    "cavalry",
+		X:       5,
+		Y:       10,
 	}
 	err = pawn.InitiatePawn()
 	if err != nil {
@@ -65,7 +67,7 @@ func CreateNewGame(db *gorm.DB, userid uint) (uint, error) {
 		return 0, err
 	}
 
-	err = board.DeployPawn(db, pawn.ID, 5, 10)
+	err = board.DeployPawn(db, pawn.ID, pawn.X, pawn.Y)
 	if err != nil {
 		return 0, err
 	}
@@ -89,6 +91,8 @@ func JoinAGame(db *gorm.DB, user2id uint, gameid uint) (uint, string, string, er
 		GameID:  gameid,
 		BoardID: game.BoardID,
 		Type:    "cavalry",
+		X:       15,
+		Y:       10,
 	}
 	err = pawn.InitiatePawn()
 	if err != nil {
@@ -104,15 +108,22 @@ func JoinAGame(db *gorm.DB, user2id uint, gameid uint) (uint, string, string, er
 	if err != nil {
 		return 0, "", "", err
 	}
-	err = board.DeployPawn(db, pawn.ID, 15, 10)
+	err = board.DeployPawn(db, pawn.ID, pawn.X, pawn.Y)
 	if err != nil {
 		return 0, "", "", err
 	}
+
+	err = game.Update(db)
+	if err != nil {
+		return 0, "", "", err
+	}
+
 	return game.User1ID, board.TerrainJson, board.FeaturedMapJson, nil
 
 }
 func MakeMoves(db *gorm.DB, in *protos.MoveInputs) error {
 	var gamestatus int8
+
 	game := games.Game{}
 	game.ID = uint(in.Gameid)
 	err := game.Read(db)
@@ -120,7 +131,13 @@ func MakeMoves(db *gorm.DB, in *protos.MoveInputs) error {
 		log.Error(err)
 		return err
 	}
-
+	board := boards.Board{}
+	board.ID = game.BoardID
+	err = board.Read(db)
+	if err != nil {
+		log.Error(err)
+		return err
+	}
 	for _, input := range in.Moveinput {
 		for _, move := range input.Move {
 			m := moves.Move{}
@@ -144,12 +161,68 @@ func MakeMoves(db *gorm.DB, in *protos.MoveInputs) error {
 			log.Error(err)
 			return err
 		}
-		//TODO play the game
+
+		for _, mv := range movesList {
+			if mv.UserID == game.User1ID {
+				user1Moves = append(user1Moves, mv)
+			} else {
+				user2Moves = append(user2Moves, mv)
+			}
+		}
+		var maxlength int
+		if len(user1Moves) > len(user2Moves) {
+			maxlength = len(user1Moves)
+		} else {
+			maxlength = len(user2Moves)
+		}
+
+		for i := 0; i < maxlength; i++ {
+			pawn1 := pawns.Pawn{}
+			pawn2 := pawns.Pawn{}
+			pawn1.ID = user1Moves[i].PawnID
+			pawn2.ID = user2Moves[i].PawnID
+			err = pawn1.Read(db)
+			if err != nil {
+				log.Error(err)
+				return err
+			}
+			err = pawn2.Read(db)
+			if err != nil {
+				log.Error(err)
+				return err
+			}
+
+			board.Terrain[pawn1.Y][pawn1.X] = 0
+			pawn1.X = pawn1.X + user1Moves[i].X
+			pawn1.Y = pawn1.Y + user1Moves[i].Y
+			board.Terrain[pawn1.Y][pawn1.X] = int16(pawn1.ID)
+			err = pawn1.Update(db)
+			if err != nil {
+				log.Error(err)
+				return err
+			}
+			board.Terrain[pawn2.Y][pawn2.X] = 0
+			pawn2.X = pawn2.X + user2Moves[i].X
+			pawn2.Y = pawn2.Y + user2Moves[i].Y
+			board.Terrain[pawn2.Y][pawn2.X] = int16(pawn2.ID)
+
+			err = pawn2.Update(db)
+			if err != nil {
+				log.Error(err)
+				return err
+			}
+
+		}
+		game.Status = gamestatus
 		game.Round++
 	} else {
 		game.Status = gamestatus
 	}
-
+	err = board.Update(db)
+	if err != nil {
+		log.Error(err)
+		return err
+	}
 	err = game.Update(db)
 	if err != nil {
 		log.Error(err)

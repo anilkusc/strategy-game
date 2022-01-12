@@ -23,6 +23,15 @@ func (b *Board) Read(db *gorm.DB) error {
 
 }
 func (b *Board) Update(db *gorm.DB) error {
+	var err error
+	b.FeaturedMapJson, err = b.ArrayToJson(b.FeaturedMap)
+	if err != nil {
+		return err
+	}
+	b.TerrainJson, err = b.ArrayToJson(b.Terrain)
+	if err != nil {
+		return err
+	}
 	result := db.Save(b)
 	return result.Error
 }

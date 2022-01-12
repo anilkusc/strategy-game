@@ -19,14 +19,14 @@ message JoinGameOutputs {
 }
 
 message Move{
-  int32 x=2;
-  int32 y=3;
-  int32 direction=4;
+  int32 x=1;
+  int32 y=2;
+  int32 direction=3;
 }
 
 message MoveInput {
-  uint32 pawnid=3;
-  repeated Move move=4;
+  uint32 pawnid=1;
+  repeated Move move=2;
 }
 
 message MoveInputs{

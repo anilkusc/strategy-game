@@ -41,7 +41,7 @@ func (m *Move) AppendMove(db *gorm.DB, gameid uint, userid uint, pawnid uint, x 
 		Round:     round,
 	}
 
-	if gamestatus == -3 && userid != user1id || gamestatus == -2 && userid != user2id {
+	if gamestatus == -3 && userid == user1id || gamestatus == -2 && userid == user2id {
 		return -100, errors.New("user has already sent the moves")
 	}
 	err := move.Create(db)
