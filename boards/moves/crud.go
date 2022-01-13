@@ -29,6 +29,12 @@ func (m *Move) HardDelete(db *gorm.DB) error {
 }
 func (m *Move) List(db *gorm.DB) ([]Move, error) {
 	var moves []Move
-	result := db.Where("game_id = ? AND round = ? ", m.GameID, m.Round).Find(&moves)
-	return moves, result.Error
+	if m.Round == 0 {
+		result := db.Where("game_id = ? ", m.GameID).Find(&moves)
+		return moves, result.Error
+	} else {
+		result := db.Where("game_id = ? AND round = ? ", m.GameID, m.Round).Find(&moves)
+		return moves, result.Error
+	}
+
 }

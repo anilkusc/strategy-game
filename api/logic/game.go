@@ -12,7 +12,7 @@ import (
 )
 
 //TODO : add logs here for != nil expressions.
-func CreateNewGame(db *gorm.DB, userid uint) (uint, error) {
+func CreateNewGame(db *gorm.DB, userid uint) (uint, string, error) {
 	var err error
 	game := games.Game{
 		User1ID: userid,
@@ -23,13 +23,13 @@ func CreateNewGame(db *gorm.DB, userid uint) (uint, error) {
 	err = game.Create(db)
 	if err != nil {
 		log.Error(err)
-		return 0, err
+		return 0, "", err
 	}
 
 	err = game.Read(db)
 	if err != nil {
 		log.Error(err)
-		return 0, err
+		return 0, "", err
 	}
 
 	board := boards.Board{
@@ -39,13 +39,13 @@ func CreateNewGame(db *gorm.DB, userid uint) (uint, error) {
 	err = board.CreateBoard(db)
 	if err != nil {
 		log.Error(err)
-		return 0, err
+		return 0, "", err
 	}
 
 	err = board.Read(db)
 	if err != nil {
 		log.Error(err)
-		return 0, err
+		return 0, "", err
 	}
 
 	pawn := pawns.Pawn{
@@ -59,29 +59,29 @@ func CreateNewGame(db *gorm.DB, userid uint) (uint, error) {
 	err = pawn.InitiatePawn()
 	if err != nil {
 		log.Error(err)
-		return 0, err
+		return 0, "", err
 	}
 	err = pawn.Create(db)
 	if err != nil {
 		log.Error(err)
-		return 0, err
+		return 0, "", err
 	}
 
 	game.BoardID = board.ID
 	err = game.Update(db)
 	if err != nil {
 		log.Error(err)
-		return 0, err
+		return 0, "", err
 	}
 
 	err = board.DeployPawn(db, pawn.ID, pawn.X, pawn.Y)
 	if err != nil {
 		log.Error(err)
-		return 0, err
+		return 0, "", err
 	}
-	return game.ID, nil
+	return game.ID, board.FeaturedMapJson, nil
 }
-func JoinAGame(db *gorm.DB, user2id uint, gameid uint) (uint, string, string, error) {
+func JoinAGame(db *gorm.DB, user2id uint, gameid uint) (uint, string, error) {
 	game := games.Game{
 		Model: gorm.Model{
 			ID: gameid,
@@ -90,7 +90,7 @@ func JoinAGame(db *gorm.DB, user2id uint, gameid uint) (uint, string, string, er
 	err := game.Read(db)
 	if err != nil {
 		log.Error(err)
-		return 0, "", "", err
+		return 0, "", err
 	}
 	game.Status = -1
 	game.User2ID = user2id
@@ -106,33 +106,33 @@ func JoinAGame(db *gorm.DB, user2id uint, gameid uint) (uint, string, string, er
 	err = pawn.InitiatePawn()
 	if err != nil {
 		log.Error(err)
-		return 0, "", "", err
+		return 0, "", err
 	}
 	err = pawn.Create(db)
 	if err != nil {
 		log.Error(err)
-		return 0, "", "", err
+		return 0, "", err
 	}
 	board := boards.Board{Model: gorm.Model{ID: game.BoardID}}
 
 	err = board.Read(db)
 	if err != nil {
 		log.Error(err)
-		return 0, "", "", err
+		return 0, "", err
 	}
 	err = board.DeployPawn(db, pawn.ID, pawn.X, pawn.Y)
 	if err != nil {
 		log.Error(err)
-		return 0, "", "", err
+		return 0, "", err
 	}
-
+	game.Round = 1
 	err = game.Update(db)
 	if err != nil {
 		log.Error(err)
-		return 0, "", "", err
+		return 0, "", err
 	}
 
-	return game.User1ID, board.TerrainJson, board.FeaturedMapJson, nil
+	return game.User1ID, board.FeaturedMapJson, nil
 
 }
 func MakeMoves(db *gorm.DB, in *protos.MoveInputs) error {
@@ -222,4 +222,16 @@ func MakeMoves(db *gorm.DB, in *protos.MoveInputs) error {
 		return err
 	}
 	return nil
+}
+func GetLastMoves(db *gorm.DB, in *protos.LastMovesInputs) ([]moves.Move, error) {
+
+	move := moves.Move{
+		GameID: uint(in.Gameid),
+		Round:  uint16(in.Round),
+	}
+	moveList, err := move.List(db)
+	if err != nil {
+		return moveList, err
+	}
+	return moveList, nil
 }
