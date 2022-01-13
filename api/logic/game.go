@@ -137,17 +137,7 @@ func JoinAGame(db *gorm.DB, user2id uint, gameid uint) (uint, string, error) {
 }
 func MakeMoves(db *gorm.DB, in *protos.MoveInputs) error {
 	var gamestatus int8
-
-	game := games.Game{}
-	game.ID = uint(in.Gameid)
-	err := game.Read(db)
-	if err != nil {
-		log.Error(err)
-		return err
-	}
-	board := boards.Board{}
-	board.ID = game.BoardID
-	err = board.Read(db)
+	game, board, err := GetGameAndBoard(db, uint(in.Gameid))
 	if err != nil {
 		log.Error(err)
 		return err
@@ -186,21 +176,25 @@ func MakeMoves(db *gorm.DB, in *protos.MoveInputs) error {
 
 			for _, moveWillPlayList := range movesWillPlayList {
 				if moveWillPlayList.PawnID == pawnid {
-					newX := pawn.X + moveWillPlayList.X
-					newY := pawn.Y + moveWillPlayList.Y
-					err = board.MovePawnTo(pawn.X, pawn.Y, newX, newY)
-					if err != nil {
-						log.Error(err)
-						return err
+
+					if len(board.CollisionControl(pawn.X, pawn.Y, pawn.Range)) < 1 {
+						newX := pawn.X + moveWillPlayList.X
+						newY := pawn.Y + moveWillPlayList.Y
+						err = board.MovePawnTo(pawn.X, pawn.Y, newX, newY)
+						if err != nil {
+							log.Error(err)
+							return err
+						}
+						pawn.X = newX
+						pawn.Y = newY
+						err = pawn.Update(db)
+						if err != nil {
+							log.Error(err)
+							return err
+						}
+						break
+
 					}
-					pawn.X = newX
-					pawn.Y = newY
-					err = pawn.Update(db)
-					if err != nil {
-						log.Error(err)
-						return err
-					}
-					break
 				}
 			}
 
@@ -210,13 +204,7 @@ func MakeMoves(db *gorm.DB, in *protos.MoveInputs) error {
 	} else {
 		game.Status = gamestatus
 	}
-
-	err = board.Update(db)
-	if err != nil {
-		log.Error(err)
-		return err
-	}
-	err = game.Update(db)
+	err = UpdateGameAndBoard(db, &board, &game)
 	if err != nil {
 		log.Error(err)
 		return err

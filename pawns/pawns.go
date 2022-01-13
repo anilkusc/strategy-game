@@ -33,7 +33,8 @@ type Pawn struct {
 	Attack    int16
 	Speed     int16
 	Affect    int16
-	Range     int8
+	Range     int8 // damageable area
+	Agility   int8 // it decides who will attack first
 	Type      string
 }
 

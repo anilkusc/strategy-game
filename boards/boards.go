@@ -120,3 +120,20 @@ func (b *Board) MovePawnTo(fromX int16, fromY int16, toX int16, toY int16) error
 
 	return nil
 }
+
+func (b *Board) CollisionControl(X int16, Y int16, rng int8) []int16 {
+	collided := []int16{}
+	var i int16
+	for i = 1; int8(i) < rng+1; i++ {
+		if b.Terrain[Y+i][X] != b.FeaturedMap[Y+i][X] {
+			collided = append(collided, b.Terrain[Y+i][X])
+		} else if b.Terrain[Y][X+i] != b.FeaturedMap[Y][X+i] {
+			collided = append(collided, b.Terrain[Y][X+i])
+		} else if b.Terrain[Y-i][X] != b.FeaturedMap[Y-i][X] {
+			collided = append(collided, b.Terrain[Y][X+i])
+		} else if b.Terrain[Y][X-i] != b.FeaturedMap[Y][X-i] {
+			collided = append(collided, b.Terrain[Y][X+i])
+		}
+	}
+	return collided
+}

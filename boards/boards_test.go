@@ -198,3 +198,35 @@ func TestMovePawnto(t *testing.T) {
 	}
 	Destruct()
 }
+func TestCollisionControl(t *testing.T) {
+	db, board := Construct()
+	board.Create(db)
+	board.DeployPawn(db, 1, 1, 1)
+	//CollisionControl(X int16, Y int16, rng int8) []int16
+	tests := []struct {
+		X      int16
+		Y      int16
+		rng    int8
+		output []int16
+	}{
+		{
+			X:      1,
+			Y:      2,
+			rng:    1,
+			output: []int16{0},
+		},
+	}
+	for _, test := range tests {
+		collisions := board.CollisionControl(test.X, test.Y, test.rng)
+		/*if len(collisions) != len(test.output) {
+			t.Errorf("Result is: %v . Expected: %v", collisions, test.output)
+		}*/
+		for i, collision := range collisions {
+			if collision != test.output[i] {
+				t.Errorf("Result is: %v . Expected: %v", collisions, test.output)
+			}
+		}
+
+	}
+	Destruct()
+}
