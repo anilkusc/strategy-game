@@ -56,11 +56,18 @@ message LastMovesOutput{
 message LastMovesOutputs{
   repeated LastMovesOutput lastmovesoutput = 1;
 }
-
+message GetMapsInput{
+  uint32 gameid = 1;
+}
+message GetMapsOutput{
+  string terrainmap = 1;
+  string featuredmap = 2;
+}
 service StrategyGame {
   rpc CreateGame (CreateGameInputs) returns (CreateGameOutputs) {}
   rpc JoinGame (JoinGameInputs) returns (JoinGameOutputs) {}
   rpc MakeMove (MoveInputs) returns (MoveOutputs) {}
   rpc GetLastMoves (LastMovesInputs) returns (LastMovesOutputs) {}
+  rpc GetMaps (GetMapsInput) returns (GetMapsOutput) {}
 }
 //protoc --go_out=. --go-grpc_out=. -I=./api/ ./api/api.proto

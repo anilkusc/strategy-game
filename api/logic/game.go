@@ -223,3 +223,11 @@ func GetLastMoves(db *gorm.DB, in *protos.LastMovesInputs) ([]moves.Move, error)
 	}
 	return moveList, nil
 }
+func GetMaps(db *gorm.DB, gameid uint32) (string, string, error) {
+
+	_, board, err := GetGameAndBoard(db, uint(gameid))
+	if err != nil {
+		return "", "", err
+	}
+	return board.TerrainJson, board.FeaturedMapJson, nil
+}

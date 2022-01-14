@@ -22,6 +22,7 @@ type StrategyGameClient interface {
 	JoinGame(ctx context.Context, in *JoinGameInputs, opts ...grpc.CallOption) (*JoinGameOutputs, error)
 	MakeMove(ctx context.Context, in *MoveInputs, opts ...grpc.CallOption) (*MoveOutputs, error)
 	GetLastMoves(ctx context.Context, in *LastMovesInputs, opts ...grpc.CallOption) (*LastMovesOutputs, error)
+	GetMaps(ctx context.Context, in *GetMapsInput, opts ...grpc.CallOption) (*GetMapsOutput, error)
 }
 
 type strategyGameClient struct {
@@ -68,6 +69,15 @@ func (c *strategyGameClient) GetLastMoves(ctx context.Context, in *LastMovesInpu
 	return out, nil
 }
 
+func (c *strategyGameClient) GetMaps(ctx context.Context, in *GetMapsInput, opts ...grpc.CallOption) (*GetMapsOutput, error) {
+	out := new(GetMapsOutput)
+	err := c.cc.Invoke(ctx, "/api.StrategyGame/GetMaps", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // StrategyGameServer is the server API for StrategyGame service.
 // All implementations must embed UnimplementedStrategyGameServer
 // for forward compatibility
@@ -76,6 +86,7 @@ type StrategyGameServer interface {
 	JoinGame(context.Context, *JoinGameInputs) (*JoinGameOutputs, error)
 	MakeMove(context.Context, *MoveInputs) (*MoveOutputs, error)
 	GetLastMoves(context.Context, *LastMovesInputs) (*LastMovesOutputs, error)
+	GetMaps(context.Context, *GetMapsInput) (*GetMapsOutput, error)
 	mustEmbedUnimplementedStrategyGameServer()
 }
 
@@ -94,6 +105,9 @@ func (UnimplementedStrategyGameServer) MakeMove(context.Context, *MoveInputs) (*
 }
 func (UnimplementedStrategyGameServer) GetLastMoves(context.Context, *LastMovesInputs) (*LastMovesOutputs, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetLastMoves not implemented")
+}
+func (UnimplementedStrategyGameServer) GetMaps(context.Context, *GetMapsInput) (*GetMapsOutput, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetMaps not implemented")
 }
 func (UnimplementedStrategyGameServer) mustEmbedUnimplementedStrategyGameServer() {}
 
@@ -180,6 +194,24 @@ func _StrategyGame_GetLastMoves_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
+func _StrategyGame_GetMaps_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetMapsInput)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(StrategyGameServer).GetMaps(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/api.StrategyGame/GetMaps",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(StrategyGameServer).GetMaps(ctx, req.(*GetMapsInput))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // StrategyGame_ServiceDesc is the grpc.ServiceDesc for StrategyGame service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -202,6 +234,10 @@ var StrategyGame_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetLastMoves",
 			Handler:    _StrategyGame_GetLastMoves_Handler,
+		},
+		{
+			MethodName: "GetMaps",
+			Handler:    _StrategyGame_GetMaps_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

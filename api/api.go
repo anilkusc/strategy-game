@@ -58,3 +58,14 @@ func (a *App) GetLastMoves(ctx context.Context, in *protos.LastMovesInputs) (*pr
 	return &protos.LastMovesOutputs{Lastmovesoutput: mvs}, nil
 
 }
+func (a *App) GetMaps(ctx context.Context, in *protos.GetMapsInput) (*protos.GetMapsOutput, error) {
+
+	terrain, featured, err := logic.GetMaps(a.DB, in.Gameid)
+	if err != nil {
+		log.Error(err)
+		return &protos.GetMapsOutput{}, err
+	}
+
+	return &protos.GetMapsOutput{Featuredmap: featured, Terrainmap: terrain}, nil
+
+}
