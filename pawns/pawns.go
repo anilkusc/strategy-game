@@ -62,6 +62,10 @@ func (p *Pawn) AttackTo(db *gorm.DB, pawnID uint) error {
 	if err != nil {
 		return err
 	}
+	err = p.Read(db)
+	if err != nil {
+		return err
+	}
 	if defenderPawn.UserID == p.UserID {
 		return nil
 	}
