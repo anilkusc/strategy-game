@@ -11,7 +11,6 @@ import (
 	"gorm.io/gorm"
 )
 
-//TODO : add logs here for != nil expressions.
 func CreateNewGame(db *gorm.DB, userid uint) (uint, string, error) {
 	var err error
 	game := games.Game{
@@ -153,54 +152,12 @@ func MakeMoves(db *gorm.DB, in *protos.MoveInputs) error {
 		}
 	}
 	if gamestatus == -5 {
-		pawnList, err := board.DetectPawns(db)
+		err := GameSimulation(db, &board, &game)
 		if err != nil {
 			log.Error(err)
 			return err
 		}
 
-		movesWillPlay := moves.Move{GameID: game.ID, Round: game.Round}
-		movesWillPlayList, err := movesWillPlay.List(db)
-		if err != nil {
-			log.Error(err)
-			return err
-		}
-
-		for _, pawnid := range pawnList {
-			pawn := pawns.Pawn{Model: gorm.Model{ID: pawnid}}
-			err = pawn.Read(db)
-			if err != nil {
-				log.Error(err)
-				return err
-			}
-
-			for _, moveWillPlayList := range movesWillPlayList {
-				if moveWillPlayList.PawnID == pawnid {
-
-					if len(board.CollisionControl(pawn.X, pawn.Y, pawn.Range)) < 1 {
-						newX := pawn.X + moveWillPlayList.X
-						newY := pawn.Y + moveWillPlayList.Y
-						err = board.MovePawnTo(pawn.X, pawn.Y, newX, newY)
-						if err != nil {
-							log.Error(err)
-							return err
-						}
-						pawn.X = newX
-						pawn.Y = newY
-						err = pawn.Update(db)
-						if err != nil {
-							log.Error(err)
-							return err
-						}
-						break
-
-					}
-				}
-			}
-
-		}
-		game.Status = -1
-		game.Round++
 	} else {
 		game.Status = gamestatus
 	}

@@ -106,17 +106,17 @@ func (b *Board) DetectPawns(db *gorm.DB) ([]uint, error) {
 
 func (b *Board) MovePawnTo(fromX int16, fromY int16, toX int16, toY int16) error {
 	var err error
-	if b.Terrain[toY][toX] == b.FeaturedMap[toY][toX] && b.Terrain[fromY][fromX] != b.FeaturedMap[fromY][fromX] {
-		pawn := b.Terrain[fromY][fromX]
-		b.Terrain[fromY][fromX] = b.FeaturedMap[fromY][fromX]
-		b.Terrain[toY][toX] = pawn
-		b.TerrainJson, err = b.ArrayToJson(b.Terrain)
-		if err != nil {
-			return err
-		}
-	} else {
-		return errors.New("cannot move pawn")
+	//if b.Terrain[toY][toX] == b.FeaturedMap[toY][toX] && b.Terrain[fromY][fromX] != b.FeaturedMap[fromY][fromX] {
+	pawn := b.Terrain[fromY][fromX]
+	b.Terrain[fromY][fromX] = b.FeaturedMap[fromY][fromX]
+	b.Terrain[toY][toX] = pawn
+	b.TerrainJson, err = b.ArrayToJson(b.Terrain)
+	if err != nil {
+		return err
 	}
+	//} else {
+	//	return errors.New("cannot move pawn")
+	//}
 
 	return nil
 }
@@ -132,7 +132,7 @@ func (b *Board) CollisionControl(X int16, Y int16, rng int8) []int16 {
 		} else if b.Terrain[Y-i][X] != b.FeaturedMap[Y-i][X] {
 			collided = append(collided, b.Terrain[Y][X+i])
 		} else if b.Terrain[Y][X-i] != b.FeaturedMap[Y][X-i] {
-			collided = append(collided, b.Terrain[Y][X+i])
+			collided = append(collided, b.Terrain[Y][X-i])
 		}
 	}
 	return collided
@@ -152,4 +152,12 @@ func (b *Board) MoveControl(X int16, Y int16, rng int8) []int16 {
 		}
 	}
 	return collided
+}
+func (b *Board) IsPawnPathBlocked(pawnid uint, fromX int16, fromY int16, toX int16, toY int16) bool {
+	if b.Terrain[toY][toX] != b.FeaturedMap[toY][toX] {
+		return true
+	} else {
+		return false
+	}
+
 }

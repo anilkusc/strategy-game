@@ -202,7 +202,6 @@ func TestCollisionControl(t *testing.T) {
 	db, board := Construct()
 	board.Create(db)
 	board.DeployPawn(db, 1, 1, 1)
-	//CollisionControl(X int16, Y int16, rng int8) []int16
 	tests := []struct {
 		X      int16
 		Y      int16
@@ -225,6 +224,45 @@ func TestCollisionControl(t *testing.T) {
 			if collision != test.output[i] {
 				t.Errorf("Result is: %v . Expected: %v", collisions, test.output)
 			}
+		}
+
+	}
+	Destruct()
+}
+func TestIsPawnPathBlocked(t *testing.T) {
+	db, board := Construct()
+	board.Create(db)
+	board.DeployPawn(db, 1, 1, 1)
+	board.DeployPawn(db, 2, 2, 1)
+	tests := []struct {
+		pawnID uint
+		toX    int16
+		toY    int16
+		fromX  int16
+		fromY  int16
+		output bool
+	}{
+		{
+			pawnID: 1,
+			toX:    2,
+			toY:    1,
+			fromX:  1,
+			fromY:  1,
+			output: true,
+		},
+		{
+			pawnID: 1,
+			toX:    1,
+			toY:    2,
+			fromX:  1,
+			fromY:  1,
+			output: false,
+		},
+	}
+	for _, test := range tests {
+		res := board.IsPawnPathBlocked(test.pawnID, test.fromX, test.fromY, test.toX, test.toY)
+		if res != test.output {
+			t.Errorf("Result is: %v . Expected: %v", res, test.output)
 		}
 
 	}

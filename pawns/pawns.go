@@ -2,7 +2,9 @@ package pawns
 
 import (
 	"errors"
+	"math/rand"
 	"strconv"
+	"time"
 
 	log "github.com/sirupsen/logrus"
 	"gorm.io/gorm"
@@ -47,18 +49,24 @@ func (p *Pawn) InitiatePawn() error {
 		p.Speed = 6
 		p.Affect = 1
 		p.Range = 1
+		p.Agility = 1
 		return nil
 	default:
 		return errors.New("unknown pawn type")
 	}
 }
+
 func (p *Pawn) AttackTo(db *gorm.DB, pawnID uint) error {
-	log.Info("Pawn " + strconv.Itoa(int(p.ID)) + " attacking to Pawn " + strconv.Itoa(int(pawnID)))
 	defenderPawn := Pawn{Model: gorm.Model{ID: pawnID}}
 	err := defenderPawn.Read(db)
 	if err != nil {
 		return err
 	}
+	if defenderPawn.UserID == p.UserID {
+		return nil
+	}
+	log.Info("Pawn " + strconv.Itoa(int(p.ID)) + " attacking to Pawn " + strconv.Itoa(int(pawnID)))
+
 	defenderPawn.Health = defenderPawn.Health - (p.Attack - defenderPawn.Defense)
 	log.Info("Pawn " + strconv.Itoa(int(defenderPawn.ID)) + " took " + strconv.Itoa(int(p.Attack-defenderPawn.Defense)) + " damage.Now its health point is: " + strconv.Itoa(int(defenderPawn.Health)))
 	p.Health = p.Health - (defenderPawn.Attack - p.Defense)
@@ -72,4 +80,40 @@ func (p *Pawn) AttackTo(db *gorm.DB, pawnID uint) error {
 		return err
 	}
 	return nil
+}
+
+func (p *Pawn) ShufflePawns(db *gorm.DB, pawnlist []uint) ([]Pawn, error) {
+	var pawns []Pawn
+	var intervalPawns []Pawn
+	var shuffledPawns []Pawn
+	for _, pawnid := range pawnlist {
+		pawn := Pawn{
+			Model: gorm.Model{
+				ID: pawnid,
+			},
+		}
+		err := pawn.Read(db)
+		if err != nil {
+			return pawns, err
+		}
+		pawns = append(pawns, pawn)
+		for i := 0; i < int(pawn.Agility); i++ {
+			intervalPawns = append(intervalPawns, pawn)
+		}
+	}
+	for len(intervalPawns) > 0 {
+		rand.Seed(time.Now().UnixNano())
+		min := 0
+		max := len(intervalPawns) - 1
+		poppedPawn := rand.Intn(max-min+1) + min
+		shuffledPawns = append(shuffledPawns, intervalPawns[poppedPawn])
+		for i := 0; i < len(intervalPawns); i++ {
+			if intervalPawns[i].ID == intervalPawns[poppedPawn].ID {
+				intervalPawns = append(intervalPawns[:i], intervalPawns[i+1:]...)
+			}
+		}
+	}
+
+	return shuffledPawns, nil
+
 }
