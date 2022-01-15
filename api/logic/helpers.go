@@ -60,6 +60,13 @@ func GameSimulation(db *gorm.DB, board *boards.Board, game *games.Game) error {
 
 		for _, mve := range moveList {
 			if mve.PawnID == pawn.ID {
+				if mve.Direction != 0 {
+
+					err = pawn.ChangeDirection(mve.Direction)
+					if err != nil {
+						return err
+					}
+				}
 				newX := pawn.X + mve.X
 				newY := pawn.Y + mve.Y
 				collisions := board.CollisionControl(pawn.X, pawn.Y, pawn.Range)
@@ -70,6 +77,11 @@ func GameSimulation(db *gorm.DB, board *boards.Board, game *games.Game) error {
 					}
 					pawn.X = newX
 					pawn.Y = newY
+					err = pawn.Update(db)
+					if err != nil {
+						return err
+					}
+
 					newcollisions := board.CollisionControl(pawn.X, pawn.Y, pawn.Range)
 					if len(newcollisions) > 0 {
 						for _, coll := range newcollisions {
@@ -93,6 +105,10 @@ func GameSimulation(db *gorm.DB, board *boards.Board, game *games.Game) error {
 						}
 						pawn.X = newX
 						pawn.Y = newY
+						err = pawn.Update(db)
+						if err != nil {
+							return err
+						}
 					}
 				}
 				err = pawn.Update(db)

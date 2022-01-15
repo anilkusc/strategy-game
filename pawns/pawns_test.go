@@ -90,17 +90,18 @@ func TestInitiatePawn(t *testing.T) {
 				Speed:     6,
 				Affect:    1,
 				Range:     1,
+				Agility:   1,
 				Type:      "cavalry",
 			}, err: nil},
 	}
 
 	for _, test := range tests {
-		err := test.input.InitiatePawn()
+		err := test.input.InitiatePawn(test.input.Direction)
 		if test.err != err {
 			t.Errorf("Error is: %v . Expected: %v", err, test.err)
 		}
 		if test.output != test.input {
-			t.Errorf("Result is: %v . Expected: %v", test.output, test.input)
+			t.Errorf("Result is: %v . Expected: %v", test.input, test.output)
 		}
 	}
 	Destruct()
@@ -136,6 +137,78 @@ func TestShufflePawns(t *testing.T) {
 				t.Errorf("Result list is: %v . Expected list: %v", res, test.output)
 			}
 		}
+	}
+	Destruct()
+}
+
+func TestIsPawnMoveValid(t *testing.T) {
+	_, pawn := Construct()
+	tests := []struct {
+		input     Pawn
+		Direction uint8
+		X         int16
+		Y         int16
+		output    bool
+	}{
+		{
+			input:     pawn,
+			Direction: 1,
+			X:         1,
+			Y:         0,
+			output:    true},
+	}
+
+	for _, test := range tests {
+		res := pawn.IsPawnMoveValid(test.Direction, test.X, test.Y)
+		if res != test.output {
+			t.Errorf("Result is: %v . Expected: %v", res, test.output)
+		}
+
+	}
+	Destruct()
+}
+func TestCanPawnAttackTo(t *testing.T) {
+	_, pawn := Construct()
+	pawn2 := pawn
+	pawn2.X = 2
+	pawn2.Y = 1
+
+	tests := []struct {
+		input  Pawn
+		output bool
+	}{
+		{
+			input:  pawn2,
+			output: true},
+	}
+
+	for _, test := range tests {
+		res := pawn.CanPawnAttackTo(&test.input)
+		if res != test.output {
+			t.Errorf("Result is: %v . Expected: %v", res, test.output)
+		}
+
+	}
+	Destruct()
+}
+func TestChangeDirection(t *testing.T) {
+	_, pawn := Construct()
+
+	tests := []struct {
+		input uint8
+		err   error
+	}{
+		{
+			input: 1,
+			err:   nil},
+	}
+
+	for _, test := range tests {
+		err := pawn.ChangeDirection(test.input)
+		if err != test.err {
+			t.Errorf("Error is: %v . Expected: %v", err, test.err)
+		}
+
 	}
 	Destruct()
 }

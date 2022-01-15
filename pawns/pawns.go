@@ -20,6 +20,10 @@ type Pawner interface {
 	AttackTo(*gorm.DB, uint) error
 	MoveTo(*gorm.DB, uint16, uint16) error
 	InitiatePawn(*gorm.DB, uint16, uint16) error
+	ShufflePawns(*gorm.DB, []uint) ([]Pawn, error)
+	IsPawnMoveValid(int16, int16) bool
+	CanPawnAttackTo(*Pawn) bool
+	ChangeDirection(uint8) error
 }
 
 type Pawn struct {
@@ -40,7 +44,7 @@ type Pawn struct {
 	Type      string
 }
 
-func (p *Pawn) InitiatePawn() error {
+func (p *Pawn) InitiatePawn(direction uint8) error {
 	switch p.Type {
 	case "cavalry":
 		p.Health = 100
@@ -50,6 +54,7 @@ func (p *Pawn) InitiatePawn() error {
 		p.Affect = 1
 		p.Range = 1
 		p.Agility = 1
+		p.Direction = direction
 		return nil
 	default:
 		return errors.New("unknown pawn type")
@@ -69,12 +74,17 @@ func (p *Pawn) AttackTo(db *gorm.DB, pawnID uint) error {
 	if defenderPawn.UserID == p.UserID {
 		return nil
 	}
-	log.Info("Pawn " + strconv.Itoa(int(p.ID)) + " attacking to Pawn " + strconv.Itoa(int(pawnID)))
 
-	defenderPawn.Health = defenderPawn.Health - (p.Attack - defenderPawn.Defense)
-	log.Info("Pawn " + strconv.Itoa(int(defenderPawn.ID)) + " took " + strconv.Itoa(int(p.Attack-defenderPawn.Defense)) + " damage.Now its health point is: " + strconv.Itoa(int(defenderPawn.Health)))
-	p.Health = p.Health - (defenderPawn.Attack - p.Defense)
-	log.Info("Pawn " + strconv.Itoa(int(p.ID)) + " took " + strconv.Itoa(int(defenderPawn.Attack-p.Defense)) + " damage.Now its health point is: " + strconv.Itoa(int(p.Health)))
+	if p.CanPawnAttackTo(&defenderPawn) {
+		log.Info("Pawn " + strconv.Itoa(int(p.ID)) + " attacking to Pawn " + strconv.Itoa(int(pawnID)))
+		defenderPawn.Health = defenderPawn.Health - (p.Attack - defenderPawn.Defense)
+		log.Info("Pawn " + strconv.Itoa(int(defenderPawn.ID)) + " took " + strconv.Itoa(int(p.Attack-defenderPawn.Defense)) + " damage.Now its health point is: " + strconv.Itoa(int(defenderPawn.Health)))
+	}
+	if defenderPawn.CanPawnAttackTo(p) {
+		p.Health = p.Health - (defenderPawn.Attack - p.Defense)
+		log.Info("Pawn " + strconv.Itoa(int(p.ID)) + " took " + strconv.Itoa(int(defenderPawn.Attack-p.Defense)) + " damage.Now its health point is: " + strconv.Itoa(int(p.Health)))
+	}
+
 	err = p.Update(db)
 	if err != nil {
 		return err
@@ -119,5 +129,60 @@ func (p *Pawn) ShufflePawns(db *gorm.DB, pawnlist []uint) ([]Pawn, error) {
 	}
 
 	return shuffledPawns, nil
+
+}
+func (p *Pawn) IsPawnMoveValid(direction uint8, addedX int16, addedY int16) bool {
+	valid := true
+	/*valid := false
+	switch direction {
+	case 1:
+		if addedX > -1 && addedY == 0 {
+			valid = true
+		}
+	case 2:
+		if addedY > -1 && addedX == 0 {
+			valid = true
+		}
+	case 3:
+		if addedX < 1 && addedY == 0 {
+			valid = true
+		}
+	case 4:
+		if addedY < 1 && addedX == 0 {
+			valid = true
+		}
+	}*/
+	return valid
+}
+func (p *Pawn) CanPawnAttackTo(defenderPawn *Pawn) bool {
+	attackable := false
+	switch p.Direction {
+	case 1:
+		if (defenderPawn.X-p.X) >= 0 && (defenderPawn.X-p.X) <= int16(p.Range) {
+			attackable = true
+		}
+	case 2:
+		if (defenderPawn.Y-p.Y) >= 0 && (defenderPawn.Y-p.Y) <= int16(p.Range) {
+			attackable = true
+		}
+	case 3:
+		if (p.X-defenderPawn.X) >= 0 && (p.X-defenderPawn.X) <= int16(p.Range) {
+			attackable = true
+		}
+	case 4:
+		if (p.Y-defenderPawn.Y) >= 0 && (p.Y-defenderPawn.Y) <= int16(p.Range) {
+			attackable = true
+		}
+	}
+	return attackable
+}
+func (p *Pawn) ChangeDirection(addedDirection uint8) error {
+	if addedDirection > 1 {
+		return errors.New("cannot move direction")
+	} else {
+		p.Direction = p.Direction + addedDirection
+		p.Direction = p.Direction % 4
+		return nil
+	}
 
 }

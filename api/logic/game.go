@@ -55,15 +55,30 @@ func CreateNewGame(db *gorm.DB, userid uint) (uint, string, error) {
 		X:       5,
 		Y:       10,
 	}
-	err = pawn.InitiatePawn()
-	if err != nil {
-		log.Error(err)
-		return 0, "", err
-	}
-	err = pawn.Create(db)
-	if err != nil {
-		log.Error(err)
-		return 0, "", err
+	for i := 3; i < 13; i = i + 3 {
+		p := pawn
+		p.Y = int16(i)
+		err = p.InitiatePawn(1)
+		if err != nil {
+			log.Error(err)
+			return 0, "", err
+		}
+		err = p.Create(db)
+		if err != nil {
+			log.Error(err)
+			return 0, "", err
+		}
+		err = p.Read(db)
+		if err != nil {
+			log.Error(err)
+			return 0, "", err
+		}
+
+		err = board.DeployPawn(db, p.ID, p.X, p.Y)
+		if err != nil {
+			log.Error(err)
+			return 0, "", err
+		}
 	}
 
 	game.BoardID = board.ID
@@ -73,11 +88,6 @@ func CreateNewGame(db *gorm.DB, userid uint) (uint, string, error) {
 		return 0, "", err
 	}
 
-	err = board.DeployPawn(db, pawn.ID, pawn.X, pawn.Y)
-	if err != nil {
-		log.Error(err)
-		return 0, "", err
-	}
 	return game.ID, board.FeaturedMapJson, nil
 }
 func JoinAGame(db *gorm.DB, user2id uint, gameid uint) (uint, string, error) {
@@ -102,16 +112,6 @@ func JoinAGame(db *gorm.DB, user2id uint, gameid uint) (uint, string, error) {
 		X:       15,
 		Y:       10,
 	}
-	err = pawn.InitiatePawn()
-	if err != nil {
-		log.Error(err)
-		return 0, "", err
-	}
-	err = pawn.Create(db)
-	if err != nil {
-		log.Error(err)
-		return 0, "", err
-	}
 	board := boards.Board{Model: gorm.Model{ID: game.BoardID}}
 
 	err = board.Read(db)
@@ -119,11 +119,26 @@ func JoinAGame(db *gorm.DB, user2id uint, gameid uint) (uint, string, error) {
 		log.Error(err)
 		return 0, "", err
 	}
-	err = board.DeployPawn(db, pawn.ID, pawn.X, pawn.Y)
-	if err != nil {
-		log.Error(err)
-		return 0, "", err
+	for i := 3; i < 13; i = i + 3 {
+		p := pawn
+		p.Y = int16(i)
+		err = p.InitiatePawn(3)
+		if err != nil {
+			log.Error(err)
+			return 0, "", err
+		}
+		err = p.Create(db)
+		if err != nil {
+			log.Error(err)
+			return 0, "", err
+		}
+		err = board.DeployPawn(db, p.ID, p.X, p.Y)
+		if err != nil {
+			log.Error(err)
+			return 0, "", err
+		}
 	}
+
 	game.Round = 1
 	err = game.Update(db)
 	if err != nil {
@@ -144,10 +159,16 @@ func MakeMoves(db *gorm.DB, in *protos.MoveInputs) error {
 	for _, input := range in.Moveinput {
 		for _, move := range input.Move {
 			m := moves.Move{}
-			gamestatus, err = m.AppendMove(db, uint(in.Gameid), uint(in.Userid), uint(input.Pawnid), int16(move.X), int16(move.Y), uint8(move.Direction), game.Round, game.BoardID, game.Status, game.User1ID, game.User2ID)
-			if err != nil {
-				log.Error(err)
-				return err
+			p := pawns.Pawn{}
+
+			if p.IsPawnMoveValid(uint8(move.Direction), int16(move.X), int16(move.Y)) {
+				gamestatus, err = m.AppendMove(db, uint(in.Gameid), uint(in.Userid), uint(input.Pawnid), int16(move.X), int16(move.Y), uint8(move.Direction), game.Round, game.BoardID, game.Status, game.User1ID, game.User2ID)
+				if err != nil {
+					log.Error(err)
+					return err
+				}
+			} else {
+				log.Error("invalid move")
 			}
 		}
 	}

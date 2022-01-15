@@ -106,7 +106,6 @@ func (b *Board) DetectPawns(db *gorm.DB) ([]uint, error) {
 
 func (b *Board) MovePawnTo(fromX int16, fromY int16, toX int16, toY int16) error {
 	var err error
-	//if b.Terrain[toY][toX] == b.FeaturedMap[toY][toX] && b.Terrain[fromY][fromX] != b.FeaturedMap[fromY][fromX] {
 	pawn := b.Terrain[fromY][fromX]
 	b.Terrain[fromY][fromX] = b.FeaturedMap[fromY][fromX]
 	b.Terrain[toY][toX] = pawn
@@ -114,9 +113,6 @@ func (b *Board) MovePawnTo(fromX int16, fromY int16, toX int16, toY int16) error
 	if err != nil {
 		return err
 	}
-	//} else {
-	//	return errors.New("cannot move pawn")
-	//}
 
 	return nil
 }
